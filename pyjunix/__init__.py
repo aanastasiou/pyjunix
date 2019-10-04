@@ -14,11 +14,10 @@ import stat
 import pwd
 import datetime
 import argparse
+import jsonpath2
+
 
 class PyJUnixException(Exception):
-    pass
-    
-class PyJUnixParameterInvalid(Exception):
     pass
     
 
@@ -293,3 +292,37 @@ class PyJls(BasePyJUnixFunction):
         
     def on_exec_over_params(self, *args, **kwargs):
         return json.dumps(self._stat_path(self.script_args.path_spec, self.script_args.recursive))
+
+
+class PyJGrep(BasePyJUnixFunction):
+    """Performs grep by applying the XPath equivalent to a JSON document"""
+    
+    def on_get_parser(self):
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjgrep", description="grep functionality over JSON documents")
+        ret_parser.add_argument("jsonpath_pattern", help="The jsonpath query string")
+        ret_parser.add_argument("cli_vars", nargs="*", help="Zero or more JSON objects to run the query over")
+        
+        return ret_parser
+        
+    def on_exec_over_params(self, before_exec_result, *args, **kwargs):
+        if not self.script_args.cli_vars:
+            return None
+        
+        result = []
+        # TODO: HIGH, This should be tested at the validate args level and raise exception if it should fail.
+        jsonpath_exp = jsonpath2.Path.parse_str(self.script_args.jsonpath_pattern)
+        
+        for a_var in self.script_args.cli_vars:
+            result.append(list(map(lambda x:x.current_value, jsonpath_exp.match())))
+            
+        return json.dumps(result)
+        
+    def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
+        print(self.script_args.jsonpath_pattern)
+        # TODO: HIGH, This should be tested at the validate args level and raise exception if it should fail.
+        jsonpath_exp = jsonpath2.Path.parse_str(self.script_args.jsonpath_pattern)
+        
+        json_data = json.load(sys.stdin)
+        return json.dumps(list(map(lambda x:x.current_value, jsonpath_exp.match(json_data))))
+
+        

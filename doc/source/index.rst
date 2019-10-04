@@ -27,6 +27,9 @@ Installation
 Notes on junix
 --------------
 
+Pure JSON Or Mixed Content?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 * A major question is how to handle mix content passing through these scripts. Mix content is a combination of JSON and
   raw strings, possibly delineated by newlines.
     * The main issue here being that newline delineated strings are basically an implicit JSON array but a newline 
@@ -54,6 +57,40 @@ Notes on junix
       input is actually mixed content (?)
       
 
+grep is XPath
+-------------
+
+* Grep is easy if you treat it as `XPath <https://en.wikipedia.org/wiki/XPath>`_. That is, ``grep`` applies regexp as
+  a "query language" over "string documents" and XPath is a query language for XML documents.
+
+* Fortunately, there is a `jsonpath <https://github.com/json-path/JsonPath>`_ and even more fortunately, there is 
+  `jsonpath2 <https://github.com/pacifica/python-jsonpath2>`_.
+
+
+Need a validator
+----------------
+
+* A script that validates json according to some json schema document and can be used in ``test``
+* This is relatively easy by using an existing jsonschema module
+* Its output could be a minimal well formed JSON document
+
+
+"Big Data" and streaming
+------------------------
+
+* For huge json files, `json.load()` might not be a good idea, both for speed and memory size reasons.
+* Alternatively, it would be possible to use something like `ijson <https://pypi.org/project/ijson/>`_ with 
+  minimal changes to the current `PyJUnix` design.
+* In that case, the validator would have to operate on a "per item" basis (expecting that each item would be smaller 
+  than the whole document. Also, the ``grep`` would have to operate in the same way.
+
+* But just as it happens with applying XPath over XML with tools such as 
+  `xsltproc <http://xmlsoft.org/XSLT/xsltproc.html>`_ for example, you can still do it but it would be better if 
+  the files were broken down into smaller, more manageable size files. (Consider for example a 1.5GB KML file. It is 
+  doable, but very difficult to work with.
+  
+* This again brings about the question of what is the sort of "target" or ideal job size for ``pyjunix``. At the moment
+  it would be possible to work over jobs that competely exhaust the memory (?).
       
       
 

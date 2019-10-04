@@ -1,4 +1,5 @@
 alabaster==0.7.12
+antlr4-python3-runtime==4.7.2
 Babel==2.7.0
 backcall==0.1.0
 certifi==2019.9.11
@@ -13,12 +14,14 @@ ipython-genutils==0.2.0
 jedi==0.15.1
 Jinja2==2.10.1
 jsonpath==0.82
+jsonpath2==0.4.1
 MarkupSafe==1.1.1
 packaging==19.2
 parso==0.5.1
 pexpect==4.7.0
 pickleshare==0.7.5
 pkg-resources==0.0.0
+ply==3.11
 prompt-toolkit==2.0.9
 ptyprocess==0.6.0
 Pygments==2.4.2

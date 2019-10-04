@@ -13,6 +13,7 @@ import os
 import stat
 import pwd
 import datetime
+import argparse
 
 class PyJUnixException(Exception):
     pass
@@ -21,7 +22,7 @@ class PyJUnixParameterInvalid(Exception):
     pass
     
 
-class PyJCommandLineArguments:
+class PyJCommandLineArgumentParser(argparse.ArgumentParser):
     """Represents the command line arguments passed to a script along with basic functions to handle them.
     
     Command line arguments to PyJUnix come in two types:
@@ -31,82 +32,56 @@ class PyJCommandLineArguments:
             * For example, in `cat onefile.txt anotherfile.txt -E`, the parameter is -E.
     """
     
-    def __init__(self, command_line_args):
-        self._arguments = []
-        self._parameters = {}
+    def parse_args(self, args = None, namespace = None):
         
-        arg_idx = 1
-        while arg_idx < len(command_line_args):
-            if command_line_args[arg_idx].startswith("-"):
-                if arg_idx != len(command_line_args)-1 and not command_line_args[arg_idx+1].startswith("-"):
-                    self._parameters[command_line_args[arg_idx]] = command_line_args[arg_idx+1]
-                    arg_idx += 2
-                else:
-                    self._parameters[command_line_args[arg_idx]] = True
-                    arg_idx += 1
+        def process_item(item_value):
+            if item_value.startswith(":"):
+                return json.loads(item_value[1:])
             else:
-                if command_line_args[arg_idx].startswith(":"):
-                    try:
-                        self._arguments.append(json.loads(command_line_args[arg_idx][1:]))
-                    except json.JSONDecodeError:
-                        # TODO: HIGH, This should raise a PyJUnix specific exception to highlight the problematic arg
-                        raise
-                    arg_idx += 1
+                # TODO: HIGH, I am trying to avoid a regexp validation here but maybe it is impossible.
+                #       Revise that `isprintable`
+                strp_value = item_value.lstrip("\"").rstrip("\"")
+                if strp_value.isnumeric():
+                    return json.loads(strp_value)
+                elif strp_value.isprintable():
+                    return json.loads("\"%s\"" % strp_value)
                 else:
-                    # TODO: HIGH, I am trying to avoid a regexp validation here but maybe it is impossible.
-                    #       Revise that `isprintable`
-                    if command_line_args[arg_idx].rstrip("\"").lstrip("\"").isprintable():
-                        self._arguments.append(json.loads("\"%s\"" % command_line_args[arg_idx].rstrip("\"").lstrip("\"")))
-                    elif command_line_args[arg_idx].isnumeric():
-                        self._arguments.append(json.loads(command_line_args[arg_idx]))
-                    else:
-                        # TODO: HIGH, At this point we should raise an exception that this input is invalid.
-                        #print((command_line_args[arg_idx].lstrip("\"").rstrip("\""), type(command_line_args[arg_idx]), command_line_args[arg_idx].isalpha()))
-                        pass
-                    arg_idx += 1
-                
-    @property
-    def arguments(self):
-        return self._arguments
+                    # TODO: HIGH, At this point we should raise an exception that this input is invalid.
+                    pass
+        parsed_args_result = super().parse_args(args, namespace)
+        sub_values = {}
         
-    @property
-    def parameters(self):
-        return self._parameters
+        for var, var_value in vars(parsed_args_result).items():
+            if type(var_value) is list:
+                sub_values[var] = [process_item(u) for u in var_value]
+            elif type(var_value) is str:
+                sub_values[var] = process_item(var_value)
+        for var, var_value in sub_values.items():
+            setattr(parsed_args_result,var,var_value)
+
+        return parsed_args_result
+            
         
-
-# TODO: HIGH, Add a staticmethod that constructs an ArgumentParser. This object is called by the constructor to parse 
-#       the arguments that are passed to it and construct the PyJCommandLineArguments object as per the requirements
-#       of PyJUnix. This would also take care of argument validation at a very early stage.
-
 class BasePyJUnixFunction:
     def __init__(self, sys_args):
-        self._script_arguments = PyJCommandLineArguments(sys_args)
-        self._calling_script = sys_args[0]
+        self._script_parser = self.on_get_parser()
+        if not isinstance(self._script_parser, PyJCommandLineArgumentParser):
+            # TODO: HIGH, This should become a PyJUnix exception on its own.
+            raise TypeError("Invalid object type {type(self._script_parser)} returned from on_get_parser(). PyJCommandLineArgumentParser expected")
+        self._script_arguments = self._script_parser.parse_args(args = sys_args[1:])
         
     @property
     def script_args(self):
-        return self._script_arguments.arguments
+        return self._script_arguments
         
-    @property
-    def script_params(self):
-        return self._script_arguments.parameters
-        
-    @property
-    def script_name(self):
-        return self._calling_script
-        
-    def on_help(self):
-        """Triggered to provide a standard help message."""
-        # TODO: HIGH, The help system can be automated further similarly to the way click structures its commands.
-        return ""
-        
-    def on_validate_params(self, *args, **kwargs):
+    def on_get_parser(self):
         """
-        Called to validate that any parameters passed are expected and contain the right value types.
+        Returns a PyJCommandLineArgumentParser for the functionality of the script.
         
-        If this step fails, `on_help` is called automatically.
+        Note:
+            This function **must** return a descendant of PyJCommandLineArgumentParser
         """
-        return True
+        return argparse.PyJCommandLineArgumentParser()
         
     def on_validate_args(self, *args, **kwargs):
         """
@@ -117,17 +92,14 @@ class BasePyJUnixFunction:
         """
         return True
         
-    def on_validate_stdin(self, *args, **kwargs):
-        return sys.stdin
-        
     def on_before_exec(self, *args, **kwargs):
         return None
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
         return before_exec_result
         
-    def on_exec_over_stdin(self, before_exec_result, validated_stream, *args, **kwargs):
-        return validated_stream
+    def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
+        return before_exec_result
         
     def on_after_exec(self, exec_result, *args, **kwargs):
         return exec_result
@@ -135,101 +107,97 @@ class BasePyJUnixFunction:
     def __call__(self, *args, **kwargs):
         #self.on_validate_args(*args, **kwargs)
         #return self.on_after_exec(self.on_exec(self.on_before_exec(*args, **kwargs), *args, **kwargs), *args, **kwargs)
+        exec_result_prm = None
+        exec_result_stdin = None
         prepare_result = self.on_before_exec(*args, **kwargs)
-        # If script parameters are present, apply over those...
-        if len(self.script_args)>0:
-            try:
-                self.on_validate_args(*args, **kwargs)
-            except Exception:
-                sys.stdout.write(self.on_help()) 
-                raise
-            exec_result = self.on_exec_over_params(prepare_result)
-        else:
-            # ... otherwise operate over stdin
-            try:
-                validated_stream = self.on_validate_stdin(*args, **kwargs)
-            except Exception:
-                sys.stdout.write(self.on_help())
-                raise
-                
-            exec_result = self.on_exec_over_stdin(prepare_result, validated_stream, *args, **kwargs)
-        
-        return self.on_after_exec(exec_result, *args, **kwargs)
+        try:
+            self.on_validate_args(*args, **kwargs)
+        except:
+            self._script_parser.print_help()
+            sys.exit(-2)
+        exec_result_prm = self.on_exec_over_params(prepare_result)
+        if not exec_result_prm:
+            exec_result_stdin = self.on_exec_over_stdin(prepare_result, *args, **kwargs)
+        return self.on_after_exec(exec_result_prm or exec_result_stdin, *args, **kwargs)
             
             
-
 class PyJKeys(BasePyJUnixFunction):
     """Returns the keys of a JSON object or raises an error if asked to operate on anything other than JSON"""
     
-    def on_help(self):
-        return "PyJKeys\n\nExtracts the keys from a mapping.\n\n"
-                
-    def on_validate_stdin(self, *args, **kwargs):
-        return json.load(super().on_validate_stdin(*args, **kwargs))
+    def on_get_parser(self):
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjkeys", description="Returns the keys of a hash")
+        ret_parser.add_argument("cli_vars", nargs="*", help="JSON Objects to extract the keys from")
+        return ret_parser
         
     def on_validate_args(self, *args, **kwargs):
-        for an_arg in enumerate(self.script_args):
-            if type(an_arg[1]) is not dict:
-                raise PyJUnixParameterInvalid("Invalid type parameter {type(an_arg[1])} for the {an_arg[0]}th parameter. Parameters to PyJKeys should evaluate to mappings")
+        for an_arg in self.script_args.cli_vars:
+            if type(an_arg) is not dict:
+                raise Exception("Oh shit")
         return True
-                
+        
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
+        if not self.script_args.cli_vars:
+            return None
+            
         result = []
-        for an_arg in self.script_args:
-            result.append(json.dumps(list(an_arg.keys())))
-        # TODO: HIGH, This dumps is repeated across scripts, it should bubble up to the base class
+        for an_item in self.script_args.cli_vars:
+            result.append(list(an_item.keys()))
         return json.dumps(result)
         
-    def on_exec_over_stdin(self, before_exec_result, validated_stream, *args, **kwargs):
-        if type(validated_stream) is not dict:
-            raise PyJUnixParameterInvalid("Invalid type parameter {type(an_arg[1])} for the {an_arg[0]}th parameter. Parameters to PyJKeys should evaluate to mappings")
-        # TODO: HIGH, This dumps is repeated across scripts, it should bubble up to the base class
-        return json.dumps(list(validated_stream.keys()))
-
+    def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
+        # Validate stdin here
+        stdin_data = json.load(sys.stdin)
+        if not type(stdin_data) is dict:
+            raise Exception("Oh Shit")
+        return json.dumps(list(stdin_data.keys()))
+    
 
 class PyJArray(BasePyJUnixFunction):
     """Packs JSON objects in its input in an array"""
     
-    def on_help(self):
-        return "PyJArray\n\nPacks its input in an array"
+    def on_get_parser(self):
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjarray", description="Packs objects in its input to an array")
+        ret_parser.add_argument("cli_vars", nargs="*", help="Zero or more items to pack to an array")
         
-    def on_validate_stdin(self, *args, **kwargs):
-        return super().on_validate_stdin(*args, **kwargs).readlines()
+        return ret_parser
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
-        return json.dumps([an_arg for an_arg in self.script_args])
+        if not self.script_args.cli_vars:
+            return None
+        return json.dumps([an_arg for an_arg in self.script_args.cli_vars])
         
-    def on_exec_over_stdin(self, before_exec_result, validated_stream, *args, **kwargs):
+    def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
         # TODO: HIGH, This fails if stdin is already formatted in JSON or anything other than one input per line
-        return json.dumps(validated_stream)
+        return json.dumps(sys.stdin.readlines())
 
 class PyJUnArray(BasePyJUnixFunction):
     """Unpacks a JSON object from an array"""
-    def on_help(self):
-        return "PyJUnArray\n\n Unpacks an array and emits its constituent parts"
-        
-    def on_validate_stdin(self, *args, **kwargs):
-        piped_data = json.load(super().on_validate_stdin(*args, **kwargs))
-        if type(piped_data) is not list:
-            raise PyJUnixParameterInvalid("Invalid type piped through stdin {type(piped_data)}. Expected list.")
-        return piped_data
+    
+    def on_get_parser(self):
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjunarray", description="Unpacks JSON objects from an array")
+        ret_parser.add_argument("cli_vars", nargs="*", help="List of arrays to unpack to a JSON array")
+        return ret_parser
         
     def on_validate_args(self, *args, **kwargs):
-        for an_arg in enumerate(self.script_args):
-            if type(an_arg[1]) is not list:
-                raise PyJUnixParameterInvalid("Invalid type parameter {type(an_arg[1])} for the {an_arg[0]}th parameter. Parameters to PyJUnArray should evaluate to lists")
+        for some_array in self.script_args.cli_vars:
+            if type(some_array) is not list:
+                raise Exception("Oh Shit")
         return True
-
-    def on_exec_over_params(self, before_exec_result, *args, **kwargs):
-        result = []
-        for an_arg in self.script_args:
-            result.extend(an_arg)
-        return "\n".join(map(lambda x:str(x), result))
-
-    def on_exec_over_stdin(self, before_exec_result, validated_stream, *args, **kwargs):
-        return "\n".join(map(lambda x:str(x), validated_stream))
         
-# TODO: HIGH, If this was to run without parameters it would fail
+    def on_exec_over_params(self, before_exec_result, *args, **kwargs):
+        if not self.script_args.cli_vars:
+            return None
+            
+        result = []
+        for an_arg in self.script_args.cli_vars:
+            result.extend(an_arg)
+            
+        return json.dumps(result)
+
+    def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
+        # NOTE: One JSON per line (?)
+        return None
+        
 class PyJls(BasePyJUnixFunction):
     """Performs a directory listing returning results as JSON"""
     
@@ -317,23 +285,11 @@ class PyJls(BasePyJUnixFunction):
         return result
 
 
-    def on_help(self):
-        return "PyJls\n\nMumble mumble"
-        
-    def on_validate_args(self, *args, **kwargs):
-        # TODO: MED, If the script has at least 1 argument check that it is a string, if it has two check that the
-        #       second is -r
-        return True
+    def on_get_parser(self):
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjls", description="List directory contents in JSON format")
+        ret_parser.add_argument("path_spec", nargs="?", default="./", help="The path to list")
+        ret_parser.add_argument("-r", dest="recursive", action="store_true", default=False, help="List recursively")
+        return ret_parser
         
     def on_exec_over_params(self, *args, **kwargs):
-        if len(self.script_args)==1:
-            path_to_scan = self.script_args[0]
-        else:
-            path_to_scan = "./"
-        
-        if len(self.script_params)==1:
-            is_recursive = self.script_params["-r"]
-        else:
-            is_recursive = False
-            
-        return json.dumps(self._stat_path(path_to_scan, is_recursive))
+        return json.dumps(self._stat_path(self.script_args.path_spec, self.script_args.recursive))

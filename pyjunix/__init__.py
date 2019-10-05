@@ -1,6 +1,5 @@
 """
-
-Sets up the basic pyjunix script skeleton.
+Sets up the basic pyjunix script skeleton and defines a handful of basic scripts.
 
 :authors: Athanasios Anastasiou
 :date: September 2019
@@ -22,13 +21,13 @@ class PyJUnixException(Exception):
     
 
 class PyJCommandLineArgumentParser(argparse.ArgumentParser):
-    """Represents the command line arguments passed to a script along with basic functions to handle them.
+    """
+    Represents the command line arguments passed to a script along with basic functions to handle them.    
     
-    Command line arguments to PyJUnix come in two types:
-        1. Arguments to the functionality of scripts
-            * For example, in `cat onefile.txt anotherfile.txt`, functionality arguments are the txt file names.
-        2. Parameters to the functionality of scripts
-            * For example, in `cat onefile.txt anotherfile.txt -E`, the parameter is -E.
+    Implements 
+    `junix' quoting conventions for arguments <https://github.com/ericfischer/junix#quoting-conventions-for-arguments>`_
+    
+    This is basically an argparse.ArgumentParser with an overriden ``parse_args()``.
     """
     
     def parse_args(self, args = None, namespace = None):
@@ -47,14 +46,19 @@ class PyJCommandLineArgumentParser(argparse.ArgumentParser):
                 else:
                     # TODO: HIGH, At this point we should raise an exception that this input is invalid.
                     pass
+                    
         parsed_args_result = super().parse_args(args, namespace)
         sub_values = {}
         
+        # There is no reason to reformat any type conversions that can already be handled by argparse.
+        # This part of the code makes sure that strings and JSON strings are stored internally as the objects
+        # they imply.
         for var, var_value in vars(parsed_args_result).items():
             if type(var_value) is list:
                 sub_values[var] = [process_item(u) for u in var_value]
             elif type(var_value) is str:
                 sub_values[var] = process_item(var_value)
+        
         for var, var_value in sub_values.items():
             setattr(parsed_args_result,var,var_value)
 
@@ -62,68 +66,125 @@ class PyJCommandLineArgumentParser(argparse.ArgumentParser):
             
         
 class BasePyJUnixFunction:
+    """
+    The base object for all PyJUnix scripts.
+    
+    It sets up the basic instantiation, argument validation and logic of execution so that actual functionality 
+    can be implemented by deriving a small amount of functions.
+    """
+    
     def __init__(self, sys_args):
+        """
+        Initialises the script through a list of parameters.
+        
+        This is most commonly ``sys.argv``, but there is nothing stopping someone from instantiating a PyJUnix script 
+        with the "equivalent" of a call.
+        
+        :param sys_args: List of command line arguments.
+        :type sys_args: list of str
+        """
         self._script_parser = self.on_get_parser()
         if not isinstance(self._script_parser, PyJCommandLineArgumentParser):
             # TODO: HIGH, This should become a PyJUnix exception on its own.
+            # TODO: HIGH, f-strings once 3.6 is sorted (!)
             raise TypeError("Invalid object type {type(self._script_parser)} returned from on_get_parser(). PyJCommandLineArgumentParser expected")
         self._script_arguments = self._script_parser.parse_args(args = sys_args[1:])
         
     @property
     def script_args(self):
+        """
+        Returns the parsed arguments in their final (computable) form.
+        """
         return self._script_arguments
         
     def on_get_parser(self):
         """
-        Returns a PyJCommandLineArgumentParser for the functionality of the script.
+        Returns a PyJCommandLineArgumentParser that takes care of the argument scanning logic of the script.
         
         Note:
-            This function **must** return a descendant of PyJCommandLineArgumentParser
+            This function **must** return a descendant of PyJCommandLineArgumentParser.
+            
+        :returns: PyJCommandLineArgumentParser.
         """
         return argparse.PyJCommandLineArgumentParser()
         
     def on_validate_args(self, *args, **kwargs):
         """
-        Called to perform validation on any arguments passed to the script.
+        Validates any arguments passed to the script.
         
         This adds an extra layer of validation for scripts that expect specific JSON data types at their input.
-        For example `JKeys` operates only over maps in its input and anything else should raise an error.
+        For example ``JKeys`` expects only maps in its input and anything else should raise an error.
         """
         return True
         
     def on_before_exec(self, *args, **kwargs):
+        """
+        Called before the execution of the main processing step of the script.
+        
+        This stage can be used to initialise any objects that are required throughout the object's lifetime.
+        
+        :returns: A result that is propagated to ``on_exec_*()`` and ``on_after_exec()`` functions.
+        """
         return None
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
+        """
+        Called to apply the script's functionality over command line parameters.
+        
+        Mandatory parameters (and any halting required if these are not passed) should be handled by the argparse
+        validator.
+        
+        If the script can be invoked without command line arguments (or arguments that also apply to processing input 
+        in the stdin) then this function should return None.
+        """
         return before_exec_result
         
     def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
+        """
+        Called to apply the script's functionality over stdin.
+        """
         return before_exec_result
         
     def on_after_exec(self, exec_result, *args, **kwargs):
+        """
+        Called after the main processing stage to perform any required cleanup
+        """
         return exec_result
         
     def __call__(self, *args, **kwargs):
-        #self.on_validate_args(*args, **kwargs)
-        #return self.on_after_exec(self.on_exec(self.on_before_exec(*args, **kwargs), *args, **kwargs), *args, **kwargs)
+        """
+        Handles the whole script invocation logic
+        """
         exec_result_prm = None
         exec_result_stdin = None
+        # Run any initialisation
         prepare_result = self.on_before_exec(*args, **kwargs)
+        # Make sure that the arguments are in the expected format
         try:
             self.on_validate_args(*args, **kwargs)
         except:
             self._script_parser.print_help()
             sys.exit(-2)
+        # Attempt to run over command line input...    
         exec_result_prm = self.on_exec_over_params(prepare_result)
+        # ...if that does not return anything, run over stdin.
+        # If stdin is empty, the script will appear to hang (typical). Ctrl-D to signal EOF.
         if not exec_result_prm:
             exec_result_stdin = self.on_exec_over_stdin(prepare_result, *args, **kwargs)
+        # Run the final stage and return the result
         return self.on_after_exec(exec_result_prm or exec_result_stdin, *args, **kwargs)
             
             
 class PyJKeys(BasePyJUnixFunction):
-    """Returns the keys of a JSON object or raises an error if asked to operate on anything other than JSON"""
+    """
+    Returns the keys of a JSON mapping. 
+    
+    Anything other than a JSON mapping is an error condition.
+    """
     
     def on_get_parser(self):
+        # TODO: HIGH, This can be abstracted more to PyJUnixFunctions that are supposed to operate over zero or more 
+        #       "input" parameters.
         ret_parser = PyJCommandLineArgumentParser(prog="pyjkeys", description="Returns the keys of a hash")
         ret_parser.add_argument("cli_vars", nargs="*", help="JSON Objects to extract the keys from")
         return ret_parser
@@ -131,10 +192,11 @@ class PyJKeys(BasePyJUnixFunction):
     def on_validate_args(self, *args, **kwargs):
         for an_arg in self.script_args.cli_vars:
             if type(an_arg) is not dict:
-                raise Exception("Oh shit")
+                raise TypeError("pyjkeys expects map, received {type(an_arg)}")
         return True
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
+        
         if not self.script_args.cli_vars:
             return None
             
@@ -147,16 +209,16 @@ class PyJKeys(BasePyJUnixFunction):
         # Validate stdin here
         stdin_data = json.load(sys.stdin)
         if not type(stdin_data) is dict:
-            raise Exception("Oh Shit")
+            raise TypeError("pyjkeys expects map, received {type(an_arg)} through stdin.")
         return json.dumps(list(stdin_data.keys()))
     
 
 class PyJArray(BasePyJUnixFunction):
-    """Packs JSON objects in its input in an array"""
+    """Packs JSON objects in its input to a JSON array"""
     
     def on_get_parser(self):
-        ret_parser = PyJCommandLineArgumentParser(prog="pyjarray", description="Packs objects in its input to an array")
-        ret_parser.add_argument("cli_vars", nargs="*", help="Zero or more items to pack to an array")
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjarray", description="Packs objects in its input to a JSON array")
+        ret_parser.add_argument("cli_vars", nargs="*", help="Zero or more items to pack to an array.")
         
         return ret_parser
         
@@ -173,14 +235,14 @@ class PyJUnArray(BasePyJUnixFunction):
     """Unpacks a JSON object from an array"""
     
     def on_get_parser(self):
-        ret_parser = PyJCommandLineArgumentParser(prog="pyjunarray", description="Unpacks JSON objects from an array")
-        ret_parser.add_argument("cli_vars", nargs="*", help="List of arrays to unpack to a JSON array")
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjunarray", description="Unpacks JSON objects from an array.")
+        ret_parser.add_argument("cli_vars", nargs="*", help="List of arrays to unpack to a JSON array.")
         return ret_parser
         
     def on_validate_args(self, *args, **kwargs):
         for some_array in self.script_args.cli_vars:
             if type(some_array) is not list:
-                raise Exception("Oh Shit")
+                raise TypeError("pyjunarray expects list, received {type(some_array)}.")
         return True
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
@@ -197,11 +259,21 @@ class PyJUnArray(BasePyJUnixFunction):
         # NOTE: One JSON per line (?)
         return None
         
-class PyJls(BasePyJUnixFunction):
-    """Performs a directory listing returning results as JSON"""
+class PyJLs(BasePyJUnixFunction):
+    """
+    Performs a basic directory listing returning results as JSON.
+    """
     
     @staticmethod
     def _stat_path(a_path, is_recursive = False):
+        """
+        Scans the contents of a file-system directory and returns contents. Can run recursively (use with caution).
+        
+        Note:
+            Operates over stack rather than actual recursion, will not fail due to exceeding recursion depth limit.
+        """
+        # TODO: HIGH, This really needs a maxdepth parameter, even as a precaution.
+        # TODO: HIGH, Needs handling of symbolic links.
         paths_to_stat = [(a_path,), ]
         result = {}
         
@@ -277,6 +349,9 @@ class PyJls(BasePyJUnixFunction):
                     paths_to_stat.append(current_path + (an_item,))
                 # TODO: MED, Working out where an item should be inserted in every iteration is slow, better 
                 #       do it "en masse" for all the entries of a level.
+                # TODO: HIGH, The format of ls should be defined further. The listing should really include an implicit 
+                #       "./" with an "entries" for the current directory. As it stands now, it contains two different 
+                #       formats for the same level listing of data.
                 current_level = result
                 for a_level in current_path[1:]:
                     current_level = current_level[a_level]["entries"]
@@ -285,9 +360,9 @@ class PyJls(BasePyJUnixFunction):
 
 
     def on_get_parser(self):
-        ret_parser = PyJCommandLineArgumentParser(prog="pyjls", description="List directory contents in JSON format")
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjls", description="List directory contents in JSON format.")
         ret_parser.add_argument("path_spec", nargs="?", default="./", help="The path to list")
-        ret_parser.add_argument("-r", dest="recursive", action="store_true", default=False, help="List recursively")
+        ret_parser.add_argument("-r", dest="recursive", action="store_true", default=False, help="List recursively.")
         return ret_parser
         
     def on_exec_over_params(self, *args, **kwargs):
@@ -295,12 +370,14 @@ class PyJls(BasePyJUnixFunction):
 
 
 class PyJGrep(BasePyJUnixFunction):
-    """Performs grep by applying the XPath equivalent to a JSON document"""
+    """
+    Performs grep by applying the XPath equivalent to a JSON document.
+    """
     
     def on_get_parser(self):
-        ret_parser = PyJCommandLineArgumentParser(prog="pyjgrep", description="grep functionality over JSON documents")
-        ret_parser.add_argument("jsonpath_pattern", help="The jsonpath query string")
-        ret_parser.add_argument("cli_vars", nargs="*", help="Zero or more JSON objects to run the query over")
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjgrep", description="Performs grep over JSON documents using jsonpath.")
+        ret_parser.add_argument("jsonpath_pattern", help="The jsonpath query string. (See https://github.com/json-path/JsonPath).")
+        ret_parser.add_argument("cli_vars", nargs="*", help="Zero or more JSON objects to run the query over.")
         
         return ret_parser
         
@@ -324,5 +401,3 @@ class PyJGrep(BasePyJUnixFunction):
         
         json_data = json.load(sys.stdin)
         return json.dumps(list(map(lambda x:x.current_value, jsonpath_exp.match(json_data))))
-
-        

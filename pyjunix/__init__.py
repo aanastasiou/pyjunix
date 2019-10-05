@@ -275,7 +275,7 @@ class PyJLs(BasePyJUnixFunction):
         # TODO: HIGH, This really needs a maxdepth parameter, even as a precaution.
         # TODO: HIGH, Needs handling of symbolic links.
         paths_to_stat = [(a_path,), ]
-        result = {}
+        result = []
         
         while paths_to_stat:
             current_path = paths_to_stat.pop()
@@ -336,7 +336,8 @@ class PyJLs(BasePyJUnixFunction):
                 else:
                     perms+="-"
                 
-                item_data =  {"user": pwd.getpwuid(stat_item.st_uid).pw_name, 
+                item_data =  {"item": an_item, 
+                              "user": pwd.getpwuid(stat_item.st_uid).pw_name, 
                               "group": pwd.getpwuid(stat_item.st_gid).pw_name, 
                               "bytes": stat_item.st_size,
                               "created":datetime.datetime.utcfromtimestamp(stat_item.st_ctime).isoformat(),
@@ -345,7 +346,7 @@ class PyJLs(BasePyJUnixFunction):
                               "permissions":perms}
                     
                 if perms[0]=="d" and is_recursive:
-                    item_data.update({"entries":{}})
+                    item_data.update({"entries":[]})
                     paths_to_stat.append(current_path + (an_item,))
                 # TODO: MED, Working out where an item should be inserted in every iteration is slow, better 
                 #       do it "en masse" for all the entries of a level.
@@ -354,8 +355,8 @@ class PyJLs(BasePyJUnixFunction):
                 #       formats for the same level listing of data.
                 current_level = result
                 for a_level in current_path[1:]:
-                    current_level = current_level[a_level]["entries"]
-                current_level[an_item] = item_data
+                    current_level = list(filter(lambda x:x["item"]==a_level,current_level))[0]["entries"]
+                current_level.append(item_data)
         return result
 
 

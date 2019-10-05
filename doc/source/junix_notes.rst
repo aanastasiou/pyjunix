@@ -30,15 +30,25 @@ Pure JSON Or Mixed Content?
     * Maybe there can be mixed content scripts? Or a universally agreed switch that predisposes the scripts that the 
       input is actually mixed content (?)
       
-
+      
 grep is XPath
 -------------
 
-* Grep is easy if you treat it as `XPath <https://en.wikipedia.org/wiki/XPath>`_. That is, ``grep`` applies regexp as
-  a "query language" over "string documents" and XPath is a query language for XML documents.
+* Grep is easy if you treat it as `XPath <https://en.wikipedia.org/wiki/XPath>`_. 
+  That is, ``grep`` applies regexp as a "query language" over "string documents" and XPath is a query language for 
+  XML documents.
 
 * Fortunately, there is a `jsonpath <https://github.com/JSON-path/JsonPath>`_ and even more fortunately, there is 
-  `jsonpath2 <https://github.com/pacifica/python-jsonpath2>`_.
+  `jsonpath2 <https://github.com/pacifica/python-jsonpath2>`_ for Python.
+
+
+ls output is nested lists
+-------------------------
+
+* If ``ls`` is not formatted as a set of nested lists, it is very difficult to query it with ``PyJGrep`` later on.
+  Every mapping would be an object.
+  
+* With nested lists, the ``jsonpath`` expression will be evaluated for each list item.
 
 
 Need for a schema validator

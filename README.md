@@ -2,7 +2,7 @@
 
 An attempt at implementing Eric Fischer's `junix` in Python.
 
-Scripts implemented so far includes:
+Scripts implemented so far include:
 
 * ``pyjkeys``
 * ``pyjarray``
@@ -156,4 +156,4 @@ Human readable form:
 ## More information
 
 For more details on this project checkout the documentation in 'doc/' as well as 
-[Eric Fischer's original `junix` spec repository](](https://github.com/ericfischer/junix>).
+Eric Fischer's original [junix spec repository](https://github.com/ericfischer/junix).

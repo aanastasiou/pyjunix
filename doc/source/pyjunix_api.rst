@@ -27,3 +27,5 @@ Main functionality
 .. autoclass:: pyjunix.PyJGrep
 
 .. autoclass:: pyjunix.PyJLs
+
+.. autoclass:: pyjunix.PyJPrtPrn

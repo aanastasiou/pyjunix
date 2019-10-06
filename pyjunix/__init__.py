@@ -147,13 +147,13 @@ class BasePyJUnixFunction:
         
     def on_after_exec(self, exec_result, *args, **kwargs):
         """
-        Called after the main processing stage to perform any required cleanup
+        Called after the main processing stage to perform any required cleanup.
         """
         return exec_result
         
     def __call__(self, *args, **kwargs):
         """
-        Handles the whole script invocation logic
+        Handles the whole script invocation logic.
         """
         exec_result_prm = None
         exec_result_stdin = None
@@ -179,7 +179,7 @@ class PyJKeys(BasePyJUnixFunction):
     """
     Returns the keys of a JSON mapping. 
     
-    Anything other than a JSON mapping as input to `PyJKeys` is an error condition.
+    Anything other than a JSON mapping as input to ``PyJKeys`` is an error condition.
     """
     
     def on_get_parser(self):
@@ -217,7 +217,7 @@ class PyJArray(BasePyJUnixFunction):
     """
     Packs JSON objects in its input to a JSON array
     
-    When operating over `stdin`, it is assumed that the input is a newline delineated list of JSON items.
+    When operating over ``stdin``, it is assumed that the input is a newline delineated list of JSON items.
     """
     
     def on_get_parser(self):
@@ -239,7 +239,7 @@ class PyJUnArray(BasePyJUnixFunction):
     """
     Unpacks a JSON object from a list to a newline delineated list of items.
     
-    Anything other than a list as input to PyJUnArray is an error condition.
+    Anything other than a list as input to ``PyJUnArray`` is an error condition.
     """
     
     def on_get_parser(self):
@@ -275,10 +275,10 @@ class PyJLs(BasePyJUnixFunction):
     Performs a basic directory listing returning results as a JSON document.
     
     By default lists the contents of the current directory. 
-    Optional parameter `-maxdepth <N>` applies `ls` recursively to sub-directories.
-    If `-maxdepth -1`, it will perform an exhaustive recursive application. Use with caution.
+    Optional parameter ``-maxdepth <N>`` applies ``ls`` recursively to sub-directories.
+    If ``-maxdepth -1``, it will perform an exhaustive recursive application. Use with caution.
     
-    `PyJLs` returns a list of JSON mappings. Each mapping contains the following attributes:
+    ``PyJLs`` returns a list of JSON mappings. Each mapping contains the following attributes:
     
     * item        Item name (Where "Item" can be a directory, file or link)
     * user        Item user ownership
@@ -288,13 +288,13 @@ class PyJLs(BasePyJUnixFunction):
     * accessed    Iso date of last item access
     * modified    Iso date of last item modification
     * permissions File access permissions
-        * Standard `ls` permissions string starting with (d,l,-) to denote a directory, link or plain file, followed by
-          three triplets of `rwx-` characters, one for each User, Group, Other category of users. Lack of a particular
-          permission is denoted with `-`. For example, a directory that can only be accessed by its user would have 
-          a permission string of `dxrw------`. 
+        * Standard ``ls`` permissions string starting with ``d,l,-`` to denote a directory, link or plain file, 
+          followed by three triplets of ``rwx-`` characters, one for each User, Group, Other category of users. 
+          Lack of a particular permission is denoted with ``-``. For example, a directory that can only be accessed by 
+          its user would have a permission string of ``dxrw------``. 
           
-    * entries     A list of mappings with the contents of `item` if that is a directory and `PyJLs` has desended into 
-                  it.
+    * entries     A list of mappings with the contents of ``item`` if that is a directory and ``PyJLs`` has desended 
+                  into it.
   
     """
     
@@ -411,12 +411,12 @@ class PyJGrep(BasePyJUnixFunction):
     It accepts a jsonpath query string and zero or more command line parameters. In this case, it evaluates the 
     query string on each content item passed as a command line parameter and returns its result in an array.
     
-    When operating over `stdin`, it assumes a single properly formatted document at its input.
+    When operating over ``stdin``, it assumes a single properly formatted document at its input.
     
     By definition, PyJGrep should return lists as its result is produced by iterative application of the query string 
     over its command line parameters (for example). However, if the result of a query is a single item list, the content
-    of that item is returned rather than the list. This saves additional `pyjunix` script calling later on, to isolate 
-    those single items.
+    of that item is returned rather than the list. This saves additional ``pyjunix`` script invocation later on, to 
+    isolate those single items.
     """
     
     def on_get_parser(self):
@@ -457,3 +457,30 @@ class PyJGrep(BasePyJUnixFunction):
             query_result = query_result[0]
             
         return json.dumps(query_result)
+
+
+class PyJPrtPrn(BasePyJUnixFunction):
+    """
+    Renders JSON content in a more human readable form (Pretty Print).
+    
+    While ``PyJPrtPrn`` does not break the JSON format in any way, it is best if it is called last in a pipe sequence.
+    This will reduce the load of parsing extra whitespace characters. But also, if ``PyJPrtPrn`` is called "mid-script"
+    it will disrupt the functionality of ``PyJArray, PyJUnArray`` that expect JSON items in "compact form". Use with 
+    caution.
+    """
+    
+    def on_get_parser(self):
+        ret_parser = PyJCommandLineArgumentParser(prog="pyprtprn", description="Renders JSON content in a more human readable form.")
+        ret_parser.add_argument("cli_vars", nargs="*", help="Zero or more JSON objects to pretty print.")
+        
+        return ret_parser
+        
+    def on_exec_over_params(self, before_exec_result, *args, **kwargs):
+        return self.script_args.cli_vars
+        
+    def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
+        stdin_data = json.load(sys.stdin)
+        return stdin_data
+        
+    def on_after_exec(self, exec_result, *args, **kwargs):
+        return json.dumps(exec_result, indent=4, sort_keys=True)

@@ -265,7 +265,7 @@ class PyJLs(BasePyJUnixFunction):
     """
     
     @staticmethod
-    def _stat_path(a_path, is_recursive = False):
+    def _stat_path(a_path, maxdepth=1):
         """
         Scans the contents of a file-system directory and returns contents. Can run recursively (use with caution).
         
@@ -345,7 +345,7 @@ class PyJLs(BasePyJUnixFunction):
                               "modified":datetime.datetime.utcfromtimestamp(stat_item.st_mtime).isoformat(),
                               "permissions":perms}
                     
-                if perms[0]=="d" and is_recursive:
+                if perms[0]=="d" and (len(current_path)<maxdepth or maxdepth<0):
                     item_data.update({"entries":[]})
                     paths_to_stat.append(current_path + (an_item,))
                 # TODO: MED, Working out where an item should be inserted in every iteration is slow, better 
@@ -363,11 +363,11 @@ class PyJLs(BasePyJUnixFunction):
     def on_get_parser(self):
         ret_parser = PyJCommandLineArgumentParser(prog="pyjls", description="List directory contents in JSON format.")
         ret_parser.add_argument("path_spec", nargs="?", default="./", help="The path to list")
-        ret_parser.add_argument("-r", dest="recursive", action="store_true", default=False, help="List recursively.")
+        ret_parser.add_argument("-maxdepth", type=int, dest="maxdepth", default=1, help="Maximum recursion depth.")
         return ret_parser
         
     def on_exec_over_params(self, *args, **kwargs):
-        return json.dumps(self._stat_path(self.script_args.path_spec, self.script_args.recursive))
+        return json.dumps(self._stat_path(self.script_args.path_spec, self.script_args.maxdepth))
 
 
 class PyJGrep(BasePyJUnixFunction):

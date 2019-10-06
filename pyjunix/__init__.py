@@ -228,8 +228,8 @@ class PyJArray(BasePyJUnixFunction):
         return json.dumps([an_arg for an_arg in self.script_args.cli_vars])
         
     def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
-        # TODO: HIGH, This fails if stdin is already formatted in JSON or anything other than one input per line
-        return json.dumps(sys.stdin.readlines())
+        json_data = [json.load(u) for u in sys.stdin.readlines()]
+        return json.dumps(json_data)
 
 class PyJUnArray(BasePyJUnixFunction):
     """Unpacks a JSON object from an array"""
@@ -256,8 +256,10 @@ class PyJUnArray(BasePyJUnixFunction):
         return json.dumps(result)
 
     def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
-        # NOTE: One JSON per line (?)
-        return None
+        json_list_in_stdin = json.load(sys.stdin)
+        if not type(json_list_in_stdin) is list:
+            raise TypeError("pyjlist expects in stdin, received {type{json_list_in_stdin}")
+        return "\n".join([json.dumps(u) for u in json_list_in_stdin])
         
 class PyJLs(BasePyJUnixFunction):
     """
@@ -396,7 +398,7 @@ class PyJGrep(BasePyJUnixFunction):
         return json.dumps(result)
         
     def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
-        print(self.script_args.jsonpath_pattern)
+        # print(self.script_args.jsonpath_pattern)
         # TODO: HIGH, This should be tested at the validate args level and raise exception if it should fail.
         jsonpath_exp = jsonpath2.Path.parse_str(self.script_args.jsonpath_pattern)
         

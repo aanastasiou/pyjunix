@@ -1,36 +1,6 @@
 Notes on junix
 ==============
 
-Pure JSON Or Mixed Content?
----------------------------
-
-* A major question is how to handle mix content passing through these scripts. Mix content is a combination of JSON and
-  raw strings, possibly delineated by newlines.
-    * Newline delineated strings are basically an implicit JSON array but a newline 
-      delineated JSON object is not a JSON object. If the input was something like:
-      ::
-      
-          {"Stavro":4,
-           "Mula":2}
-          "Beta"
-          
-      Then a tool like ``pyjarray`` (for example) would have to infer that it is dealing with mixed content in its 
-      ``stdin`` and produce the output ``[ {"Stavro":4, "Mula":2}, "Beta" ]``, rather than ``[ "{"Stavro":4,", 
-      ""Mula":2", ""Beta"" ]`` that it produces now.
-      
-    * This in turn means employing a mixed content JSON parser 
-        * This could be done with ``pyparsing`` (for example) but it would be extremely slow for huge documents.
-        * It might be possible to put something together just by looking for specific literal characters that imply 
-          specific JSON types (``{}, [], "", something numeric``).
-          
-    * If ``junix`` respects JSON throughout, then the tools are supposed to communicate via well formatted JSON.
-        * ``pyjkeys`` for example, returns a JSON array of a map's keys, rather than newline delineated strings.
-        * At the same time, this reduces somewhat the functionality (and purpose) of ``jarray``.
-        
-    * Maybe there can be mixed content scripts? Or a universally agreed switch that predisposes the scripts that the 
-      input is actually mixed content (?)
-      
-      
 grep is XPath
 -------------
 

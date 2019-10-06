@@ -2,7 +2,7 @@
 
 An attempt at implementing Eric Fischer's `junix` in Python.
 
-Scripts implemented so far includes:
+Scripts implemented so far include:
 
 * ``pyjkeys``
 * ``pyjarray``

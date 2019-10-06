@@ -393,9 +393,16 @@ class PyJGrep(BasePyJUnixFunction):
         jsonpath_exp = jsonpath2.Path.parse_str(self.script_args.jsonpath_pattern)
         
         for a_var in self.script_args.cli_vars:
-            result.append(list(map(lambda x:x.current_value, jsonpath_exp.match())))
-            
-        return json.dumps(result)
+            query_results = list(map(lambda x:x.current_value, jsonpath_exp.match(a_var)))
+            if len(query_results) == 1:
+                result.append(query_results[0])
+            else:
+                result.append(query_results)
+                
+        if len(result) == 1:
+            return json.dumps(result[0])
+        else:
+            return json.dumps(result)
         
     def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
         # print(self.script_args.jsonpath_pattern)
@@ -403,4 +410,8 @@ class PyJGrep(BasePyJUnixFunction):
         jsonpath_exp = jsonpath2.Path.parse_str(self.script_args.jsonpath_pattern)
         
         json_data = json.load(sys.stdin)
-        return json.dumps(list(map(lambda x:x.current_value, jsonpath_exp.match(json_data))))
+        query_result = list(map(lambda x:x.current_value, jsonpath_exp.match(json_data)))
+        if len(query_result) == 1:
+            query_result = query_result[0]
+            
+        return json.dumps(query_result)

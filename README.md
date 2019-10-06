@@ -9,6 +9,7 @@ Scripts implemented so far includes:
 * ``pyjunarray``
 * ``pyjls``
 * ``pyjgrep``
+* ``pyjprtprn``
 
 ## Installation
 
@@ -23,7 +24,8 @@ Scripts implemented so far includes:
 
 These two functions operate as a "bridge" between JSON and "mixed content". 
 
-Mixed content is any newline delineated list of items that is interpreted as a list.
+Mixed content is any newline delineated list of items that is interpreted as a JSON list as long as JSON items are 
+in "compact format" (which minimises whitespace).
 
 For example, let's create a JSON document from a list of numbers:
 
@@ -33,7 +35,7 @@ For example, let's create a JSON document from a list of numbers:
     
 ```
 
-Will emit `[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]`.
+Will emit `[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]` (Notice here: The list elements are numeric).
 
 Passing this through "unarray" brings us back to the original document in this example:
 
@@ -41,6 +43,22 @@ Passing this through "unarray" brings us back to the original document in this e
 
     > seq 1 10|./pyjarray.py|./pyjunarray.py
 
+```
+
+Will emit
+
+```
+    1
+    2
+    3
+    4
+    5
+    6
+    7
+    8
+    9
+    10
+    
 ```
 
 ### PyJKeys
@@ -55,7 +73,7 @@ Will emit `["Alpha", "Beta", "Gamma"]`.
 
 A very simple `ls` that produces a nested list JSON document with a directory listing.
 
-Straightforward invocation lists all item in the current directory. For example, called in `pyjunix` directory:
+Straightforward invocation lists all items in the current directory. For example, called in `pyjunix` directory:
 
 ```
 
@@ -83,9 +101,6 @@ Will emit:
 
 ```
 
-If an item is a directory within which `pyjls` descended, it would also contain an `entries` attribute with a listing 
-of its contents.
-
 By default the recursion level is set to 1. It can be controlled with `-maxdepth <N>` where `N` is the maximum depth 
 to descend to. Setting `maxdepth` to `-1` will perform an exhaustive list.
 
@@ -103,10 +118,11 @@ item"_.
 A more long winded way of expressing this would be to retrieve all items that contain ``entries`` as:
 
 ```
-    > ./pyjls.py -maxdepth -1|./pyjgrep.py '$[*][?(@.entries.length()>0)].item'
+    > ./pyjls.py -maxdepth 2|./pyjgrep.py '$[*][?(@.entries.length()>0)].item'
 ```
 
-**Notice here** `pyjls` is invoked with the `-r` switch.
+**Notice here** `pyjls` was invoked with a ``-maxdepth`` to enable `pyjls` to descend into lower directories and 
+produce items with `entries` elements in their mapping.
 
 Or, the same thing but returning the number of items in each directory as :
 
@@ -114,8 +130,28 @@ Or, the same thing but returning the number of items in each directory as :
     > ./pyjls.py -r|./pyjgrep.py '$[*][?(@.entries.length()>0)].entries.length()`
 ```
 
+### PyJPrtPrn
 
+Pretty print output. This is usually the last script in a piped chain of scripts.
 
+A plain invocation of ``pyjls``, will return the results in compact form, which is very difficult to read, especially 
+if the result is too long.
+
+Compact JSON form:
+
+```
+
+    > ./pyjls.py
+
+```
+
+Human readable form:
+
+```
+
+    > ./pyjls.py|./pyjprtprn.py
+    
+```
 
 ## More information
 

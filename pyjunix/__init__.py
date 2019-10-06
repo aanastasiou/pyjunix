@@ -228,7 +228,7 @@ class PyJArray(BasePyJUnixFunction):
         return json.dumps([an_arg for an_arg in self.script_args.cli_vars])
         
     def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
-        json_data = [json.load(u) for u in sys.stdin.readlines()]
+        json_data = [json.loads(u) for u in map(lambda x:x.rstrip("\n"), sys.stdin.readlines())]
         return json.dumps(json_data)
 
 class PyJUnArray(BasePyJUnixFunction):

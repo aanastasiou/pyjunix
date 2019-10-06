@@ -8,13 +8,7 @@ Welcome to pyjunix's documentation!
 
 ``pyjunix`` is an attempt at implementing `Eric Fischer's junix <https://github.com/ericfischer/junix>`_.
 
-The functionality implemented so far includes:
-
-* ``pyjkeys``
-* ``pyjarray``
-* ``pyjunarray``
-* ``pyjls``
-* ``pyjgrep``
+For the functionality that has been implemented so far, please see :ref:`current_imp_status` 
 
 Installation
 ------------

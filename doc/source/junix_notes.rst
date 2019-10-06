@@ -5,8 +5,8 @@ grep is XPath
 -------------
 
 * Grep is easy if you treat it as `XPath <https://en.wikipedia.org/wiki/XPath>`_. 
-  That is, ``grep`` applies regexp as a "query language" over "string documents" and XPath is a query language for 
-  XML documents.
+  That is, just as ``grep`` applies regexp as a "query language" over "string documents", so is XPath a query language 
+  for XML documents.
 
 * Fortunately, there is a `jsonpath <https://github.com/JSON-path/JsonPath>`_ and even more fortunately, there is 
   `jsonpath2 <https://github.com/pacifica/python-jsonpath2>`_ for Python.
@@ -18,7 +18,7 @@ ls output is nested lists
 * If ``ls`` is not formatted as a set of nested lists, it is very difficult to query it with ``PyJGrep`` later on.
   Every mapping would be an object.
   
-* With nested lists, the ``jsonpath`` expression will be evaluated for each list item.
+* With nested lists, the ``jsonpath`` expression of grep can be considerably simplified.
 
 
 Need for a schema validator
@@ -32,7 +32,7 @@ Need for a schema validator
 Data volume and streaming
 -------------------------
 
-* For huge JSON files, `JSON.load()` might not be a good idea, both for speed and memory size reasons.
+* For huge JSON files, ``JSON.load()`` might not be a good idea, both for speed and memory size reasons.
 * Alternatively, it would be possible to use something like `ijson <https://pypi.org/project/ijson/>`_ with 
   minimal changes to the current `PyJUnix` design.
 * In that case, the validator would have to operate on a "per item" basis (expecting that each item would be smaller 
@@ -44,4 +44,4 @@ Data volume and streaming
   doable, but very difficult to work with.
   
 * This again brings about the question of what is the sort of "target" or ideal job size for ``pyjunix``. At the moment
-  it would be possible to work over jobs that competely exhaust the memory (?).
+  it would be possible to work over jobs that competely exhaust the memory.

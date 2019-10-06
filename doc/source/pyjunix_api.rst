@@ -13,6 +13,7 @@ Core Objects
 .. autoclass:: pyjunix.BasePyJUnixFunction
     :members:
     
+.. _current_imp_status:
     
 Main functionality
 ------------------
@@ -26,7 +27,3 @@ Main functionality
 .. autoclass:: pyjunix.PyJGrep
 
 .. autoclass:: pyjunix.PyJLs
-
-.. autoclass:: pyjunix.PyJKeys
-
-.. autoclass:: pyjunix.PyJKeys

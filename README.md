@@ -156,4 +156,4 @@ Human readable form:
 ## More information
 
 For more details on this project checkout the documentation in 'doc/' as well as 
-Eric Fischer's original [junix spec repository](](https://github.com/ericfischer/junix>).
+Eric Fischer's original [junix spec repository](https://github.com/ericfischer/junix).

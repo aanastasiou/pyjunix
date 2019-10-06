@@ -87,7 +87,7 @@ class BasePyJUnixFunction:
         if not isinstance(self._script_parser, PyJCommandLineArgumentParser):
             # TODO: HIGH, This should become a PyJUnix exception on its own.
             # TODO: HIGH, f-strings once 3.6 is sorted (!)
-            raise TypeError("Invalid object type {type(self._script_parser)} returned from on_get_parser(). PyJCommandLineArgumentParser expected")
+            raise TypeError(f"Invalid object type {type(self._script_parser)} returned from on_get_parser(). PyJCommandLineArgumentParser expected")
         self._script_arguments = self._script_parser.parse_args(args = sys_args[1:])
         
     @property
@@ -192,7 +192,7 @@ class PyJKeys(BasePyJUnixFunction):
     def on_validate_args(self, *args, **kwargs):
         for an_arg in self.script_args.cli_vars:
             if type(an_arg) is not dict:
-                raise TypeError("pyjkeys expects map, received {type(an_arg)}")
+                raise TypeError(f"pyjkeys expects map, received {type(an_arg)}")
         return True
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
@@ -209,7 +209,7 @@ class PyJKeys(BasePyJUnixFunction):
         # Validate stdin here
         stdin_data = json.load(sys.stdin)
         if not type(stdin_data) is dict:
-            raise TypeError("pyjkeys expects map, received {type(an_arg)} through stdin.")
+            raise TypeError(f"pyjkeys expects map, received {type(an_arg)} through stdin.")
         return json.dumps(list(stdin_data.keys()))
     
 
@@ -250,7 +250,7 @@ class PyJUnArray(BasePyJUnixFunction):
     def on_validate_args(self, *args, **kwargs):
         for some_array in self.script_args.cli_vars:
             if type(some_array) is not list:
-                raise TypeError("pyjunarray expects list, received {type(some_array)}.")
+                raise TypeError(f"pyjunarray expects list, received {type(some_array)}.")
         return True
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
@@ -266,7 +266,7 @@ class PyJUnArray(BasePyJUnixFunction):
     def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
         json_list_in_stdin = json.load(sys.stdin)
         if not type(json_list_in_stdin) is list:
-            raise TypeError("pyjlist expects in stdin, received {type{json_list_in_stdin}")
+            raise TypeError(f"pyjunarray expects list in stdin, received {type(json_list_in_stdin)}")
         return "\n".join([json.dumps(u) for u in json_list_in_stdin])
         
 

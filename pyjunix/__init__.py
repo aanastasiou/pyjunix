@@ -209,7 +209,7 @@ class PyJKeys(BasePyJUnixFunction):
         # Validate stdin here
         stdin_data = json.load(sys.stdin)
         if not type(stdin_data) is dict:
-            raise TypeError(f"pyjkeys expects map, received {type(an_arg)} through stdin.")
+            raise TypeError(f"pyjkeys expects map, received {type(stdin_data)} through stdin.")
         return json.dumps(list(stdin_data.keys()))
     
 

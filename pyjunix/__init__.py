@@ -15,6 +15,8 @@ import datetime
 import argparse
 import jsonpath2
 
+import pdb
+
 
 class PyJUnixException(Exception):
     pass
@@ -484,3 +486,55 @@ class PyJPrtPrn(BasePyJUnixFunction):
         
     def on_after_exec(self, exec_result, *args, **kwargs):
         return json.dumps(exec_result, indent=4, sort_keys=True)
+        
+
+class PyJSort(BasePyJUnixFunction):
+    """
+    Sorts items in its input. It naturally operates over lists of items.
+    
+    When called over command line arguments, it treats them as a list.
+    When called over stdin, a valid JSON list must be passed as an argument.
+    
+    Optional parameter -k (--key) specifies a jsonpath read query that is used to create an index. This
+    query could be pointing to the attribute of an arbitrarily complex object. This is equivalent to the way 
+    Python's ``sorted`` works, with its ``key`` parameter.
+    
+    Optional parameter -r (--reverse) specifies reverse sorting order.
+    
+    """
+    
+    def on_get_parser(self):
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjsort", description="Sorts input")
+        ret_parser.add_argument("cli_vars", nargs="*", help="Zero or more JSON objects to sort")
+        ret_parser.add_argument("-k", "--key", help="JSONPath to the key to be used for sorting")
+        ret_parser.add_argument("-r", "--reverse", default=False, action="store_true", help="Sort in reverse order")
+        return ret_parser
+        
+    def on_exec_over_params(self, before_exec_result, *args, **kwargs):
+        if not len(self.script_args.cli_vars):
+            return None
+
+        if not self.script_args.key:
+            index = [(u, u) for u in self.script_args.cli_vars]
+        else:
+            jsonpath_exp = jsonpath2.Path.parse_str(self.script_args.key)
+            query_results = map(lambda x:x.current_value, jsonpath_exp.match(self.script_args.cli_vars))
+            index=list(zip(query_results, self.script_args.cli_vars))
+        
+        return json.dumps(list(map(lambda x:x[1], sorted(index, key=lambda x:x[0], reverse = self.script_args.reverse))))
+
+    def on_exec_over_stdin(self, before_exec_result, *args, **kwargs):
+        # TODO: HIGH, This needs a try, catch to catch any JSON conversion errors.
+        stdin_data = json.load(sys.stdin)
+        if type(stdin_data) is not list:
+            raise TypeError(f"pyjsort expects a list in its input, received {type(stdin_data)}")
+        
+        # TODO: HIGH, Reduce code duplication in these calls.
+        if not self.script_args.key:
+            index = [(u, u) for u in stdin_data]
+        else:
+            jsonpath_exp = jsonpath2.Path.parse_str(self.script_args.key)
+            query_results = map(lambda x:x.current_value, jsonpath_exp.match(stdin_data))
+            index=list(zip(query_results, stdin_data))
+        
+        return json.dumps(list(map(lambda x:x[1], sorted(index, key=lambda x:x[0], reverse = self.script_args.reverse))))

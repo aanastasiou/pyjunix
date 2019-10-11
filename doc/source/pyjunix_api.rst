@@ -29,3 +29,5 @@ Main functionality
 .. autoclass:: pyjunix.PyJLs
 
 .. autoclass:: pyjunix.PyJPrtPrn
+
+.. autoclass:: pyjunix.PyJSort

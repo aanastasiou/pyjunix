@@ -18,8 +18,8 @@ Installation
 3. Install the requirements with ``pip install -r requirments3.txt``
 4. Try with ``python pyjls.py`` and so on.
 
-Invocation
-----------
+Launching scripts
+-----------------
 
 All functionality of ``PyJUnix`` is accessible through the script ``pyjbox.py``. This accepts the name of the script 
 to run followed by its parameters. For example, to run ``PyJLs``:
@@ -28,18 +28,16 @@ to run followed by its parameters. For example, to run ``PyJLs``:
 
     > ./pyjbox.py pyjls
     
-Alternatively, it is possible to add symbolic links to ``pyjbox.py`` and it will then decide which script to launch.
-This is a straight inspiration from the way `Busybox <https://busybox.net/>`_ works. For example, to call ``pyjls``, 
-"automatically":
+In this way, it is possible to add symbolic links to ``pyjbox.py`` and it will then decide which script to launch. For
+example:
 
 ::
 
-    > ln -s pyjbox.py pyjls
-    > ./pyjls
+    > ln -s ./pyjbox.py pyjls
     
-In this example, linking ``pyjls`` to ``pyjbox.py`` allows it to decide automatically that it needs to run ``pyjls``.
-
-
+Now ``pyjls`` can be called as if it was a standalone ``pyjls`` script. Obviously here, ``pyjbox.py`` and the symbolic 
+links to it can "live" in different locations on a file system. This is a straight inspiration from the way 
+`Busybox <https://busybox.net/>`_ works. 
 
 
 .. toctree::

@@ -18,6 +18,13 @@ Scripts implemented so far include:
 3. Install the requirements with ``pip install -r requirments.txt``
 4. Try with ``./pyjls.py`` and so on (from the project's root folder).
 
+### Launching scripts
+
+As of version 0.2, `pyjunix` includes a `pyjbox.py` script that launches all other scripts. This enables symbolic links 
+to `pyjbox` or of course plain simple launching with `pyjbox pyjls -maxepth 4`.
+
+In the following examples, sripts are launched through `pyjbox`.
+
 ## Examples
 
 ### PyJArray & PyJUnArray
@@ -31,7 +38,7 @@ For example, let's create a JSON document from a list of numbers:
 
 ```
 
-    > seq 1 10|./pyjarray.py
+    > seq 1 10|./pyjbox.py pyjarray
     
 ```
 
@@ -41,7 +48,7 @@ Passing this through "unarray" brings us back to the original document in this e
 
 ```
 
-    > seq 1 10|./pyjarray.py|./pyjunarray.py
+    > seq 1 10|./pyjbox.py pyjarray|./pyjbox.py pyjunarray
 
 ```
 
@@ -64,7 +71,7 @@ Will emit
 ### PyJKeys
 
 ```
-    > echo "{\"Alpha\":1, \"Beta\":2, \"Gamma\":3,}"|./pyjkeys.py
+    > echo "{\"Alpha\":1, \"Beta\":2, \"Gamma\":3}"|./pyjbox.py pyjkeys
 ```
 
 Will emit `["Alpha", "Beta", "Gamma"]`.
@@ -77,7 +84,7 @@ Straightforward invocation lists all items in the current directory. For example
 
 ```
 
-    > ./pyjls.py
+    > ./pyjbox.py pyjls
     
 ```
 
@@ -107,7 +114,7 @@ to descend to. Setting `maxdepth` to `-1` will perform an exhaustive list.
 ### PyJGrep
 
 ```
-    > ./pyjls.py|./pyjgrep.py '$[*][?(@.permissions.charAt(0) = \"d\")].item'
+    > ./pyjbox.py pyjls|./pyjbox.py pyjgrep '$[*][?(@.permissions.charAt(0) = \"d\")].item'
 ```
 
 Will emit all directories in the current directory.
@@ -118,39 +125,35 @@ item"_.
 A more long winded way of expressing this would be to retrieve all items that contain ``entries`` as:
 
 ```
-    > ./pyjls.py -maxdepth 2|./pyjgrep.py '$[*][?(@.entries.length()>0)].item'
+    > ./pyjbox.py pyjls -maxdepth 2|./pyjbox.py pyjgrep '$[*][?(@.entries.length()>0)].item'
 ```
 
-**Notice here** `pyjls` was invoked with a ``-maxdepth`` to enable `pyjls` to descend into lower directories and 
+**Notice here** `pyjls` was invoked with a `-maxdepth` to enable `pyjls` to descend into lower directories and 
 produce items with `entries` elements in their mapping.
 
 Or, the same thing but returning the number of items in each directory as :
 
 ```
-    > ./pyjls.py -r|./pyjgrep.py '$[*][?(@.entries.length()>0)].entries.length()`
+    > ./pyjbox.py pyjls -maxdepth -1|./pyjbox.py pyjgrep '$[*][?(@.entries.length()>0)].entries.length()'
 ```
 
 ### PyJPrtPrn
 
 Pretty print output. This is usually the last script in a piped chain of scripts.
 
-A plain invocation of ``pyjls``, will return the results in compact form, which is very difficult to read, especially 
+A plain invocation of `pyjls`, will return the results in compact form, which is very difficult to read, especially 
 if the result is too long.
 
 Compact JSON form:
 
 ```
-
-    > ./pyjls.py
-
+    > ./pyjbox.py pyjls
 ```
 
 Human readable form:
 
 ```
-
-    > ./pyjls.py|./pyjprtprn.py
-    
+    > ./pyjbox.py pyjls|./pyjbox.py pyjprtprn
 ```
 
 ## More information

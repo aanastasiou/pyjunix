@@ -562,6 +562,7 @@ class PyJLast(BasePyJUnixFunction):
         * exit1   :
         * session : Session ID
         * sec     : Seconds (Time the entry was created)
+        * sec_date: Date in isoformat
         * usec    : uSeconds (Time the entry was created)
         * addr0   : //
         * addr1   : //
@@ -596,6 +597,7 @@ class PyJLast(BasePyJUnixFunction):
                        9: "ACCOUNTING"}
         
         for an_item in result:
-            an_item.update({"type":type_lookup[an_item["type"]]})
+            an_item.update({"type":type_lookup[an_item["type"]],
+                            "sec_date":datetime.datetime.fromtimestamp(an_item["sec"]).isoformat()})
             
         return json.dumps(result)

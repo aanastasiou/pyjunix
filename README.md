@@ -9,6 +9,7 @@ Scripts implemented so far:
 * `pyjgrep`
 * `pyjprtprn`
 * `pyjsort`
+* `pyjlast`
 
 ## Installation
 
@@ -147,6 +148,15 @@ Sorting more complex data structures is possible with `jsonpath`:
 ```
 
 Here, `pyjls` will produce a directory listing which `pyjsort` will sort by the attribute `item`.
+
+### PyJLast
+
+```
+    > ./pyjbox.py pyjlast
+```
+
+Returns information about the users last logged in to the system as a JSON list of records with full information on 
+which username was logged in to the system from which device / host and at what time.
 
 
 ### PyJPrtPrn

@@ -31,3 +31,5 @@ Main functionality
 .. autoclass:: pyjunix.PyJPrtPrn
 
 .. autoclass:: pyjunix.PyJSort
+
+.. autoclass:: pyjunix.PyJLast

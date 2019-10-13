@@ -1,8 +1,6 @@
 # PyJUnix
 
-An attempt at implementing Eric Fischer's `junix` in Python.
-
-Scripts implemented so far include:
+Scripts implemented so far:
 
 * `pyjkeys`
 * `pyjarray`
@@ -14,17 +12,17 @@ Scripts implemented so far include:
 
 ## Installation
 
-1. Checkout the repository
-2. Create a `virtualenv` with Python 3
-3. Install the requirements with `pip install -r requirments.txt`
+1. Clone the repository
+2. Create a `virtualenv` with Python 3.6
+3. Install the requirements with `pip install -r requirements.txt`
 4. Try with `./pyjbox.py pyjls` and so on (from the project's root folder).
 
 ### Launching scripts
 
-As of version 0.2, `pyjunix` includes a `pyjbox.py` script that launches all other scripts. This enables symbolic links 
-to `pyjbox` or of course plain simple launching with `pyjbox pyjls -maxepth 4`.
+As of version 0.2, the project includes a `pyjbox.py` script that launches all others. This enables symbolic links 
+to `pyjbox` and plain simple launching with `pyjbox pyjls -maxdepth 4` (for example).
 
-In the following examples, sripts are launched through `pyjbox`.
+In what follows, sripts are launched through `pyjbox` and are readily available directly from the cloned repository.
 
 ## Examples
 
@@ -133,6 +131,23 @@ Or, the same thing but returning the number of items in each directory as :
 ```
     > ./pyjbox.py pyjls -maxdepth -1|./pyjbox.py pyjgrep '$[*][?(@.entries.length()>0)].entries.length()'
 ```
+
+### PyJSort
+
+```
+    > seq 1 10|./pyjbox.py pyjarray|./pyjbox.py pyjsort -r
+```
+
+Produces a sequence of numbers from 1 to 10, packs them in a JSON array and sorts them in reverse (`-r`).
+
+Sorting more complex data structures is possible with `jsonpath`:
+
+```
+    > ./pyjbox.py pyjls|./pyjbox.py pyjsort -k '$[*].item'
+```
+
+Here, `pyjls` will produce a directory listing which `pyjsort` will sort by the attribute `item`.
+
 
 ### PyJPrtPrn
 

@@ -538,3 +538,22 @@ class PyJSort(BasePyJUnixFunction):
             index=list(zip(query_results, stdin_data))
         
         return json.dumps(list(map(lambda x:x[1], sorted(index, key=lambda x:x[0], reverse = self.script_args.reverse))))
+
+
+class PyJJoin(BasePyJUnixFunction):
+    """
+    Joins two JSON files on a common attribute.
+    
+    -a FILENUM print unpairable items from FILENUM where FILENUM is 1 or 2
+    -v FILENUM, like a but suppress the joined ones.
+    -1 jsonpath of the field to join from the first json file
+    -2 jsonpath of the field to join from the second json file
+    -j FIELD (equivalent to -1 FIELD -2 FIELD).    
+    """
+    
+    def on_get_parser(self):
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjjoin", description="Joins two JSON documents on specific fields.")
+        return ret_parser
+        
+    def on_exec_over_params(self, before_exec_result, *args, **kwargs):
+        return []

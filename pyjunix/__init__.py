@@ -504,10 +504,10 @@ class PyJSort(BasePyJUnixFunction):
     """
     
     def on_get_parser(self):
-        ret_parser = PyJCommandLineArgumentParser(prog="pyjsort", description="Sorts input")
-        ret_parser.add_argument("cli_vars", nargs="*", help="Zero or more JSON objects to sort")
-        ret_parser.add_argument("-k", "--key", help="JSONPath to the key to be used for sorting")
-        ret_parser.add_argument("-r", "--reverse", default=False, action="store_true", help="Sort in reverse order")
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjsort", description="Sorts items in its input.")
+        ret_parser.add_argument("cli_vars", nargs="*", help="Zero or more JSON objects to sort. These are treated implicitly as a list.")
+        ret_parser.add_argument("-k", "--key", help="JSONPath to the key to be used for sorting items.")
+        ret_parser.add_argument("-r", "--reverse", default=False, action="store_true", help="Sort in reverse order.")
         return ret_parser
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
@@ -529,7 +529,7 @@ class PyJSort(BasePyJUnixFunction):
         if type(stdin_data) is not list:
             raise TypeError(f"pyjsort expects a list in its input, received {type(stdin_data)}")
         
-        # TODO: HIGH, Reduce code duplication in these calls.
+        # TODO: HIGH, Reduce code duplication in the functionality of these scripts.
         if not self.script_args.key:
             index = [(u, u) for u in stdin_data]
         else:

@@ -4,19 +4,20 @@ An attempt at implementing Eric Fischer's `junix` in Python.
 
 Scripts implemented so far include:
 
-* ``pyjkeys``
-* ``pyjarray``
-* ``pyjunarray``
-* ``pyjls``
-* ``pyjgrep``
-* ``pyjprtprn``
+* `pyjkeys`
+* `pyjarray`
+* `pyjunarray`
+* `pyjls`
+* `pyjgrep`
+* `pyjprtprn`
+* `pyjsort`
 
 ## Installation
 
 1. Checkout the repository
-2. Create a ``virtualenv`` with Python 3
-3. Install the requirements with ``pip install -r requirments.txt``
-4. Try with ``./pyjls.py`` and so on (from the project's root folder).
+2. Create a `virtualenv` with Python 3
+3. Install the requirements with `pip install -r requirments.txt`
+4. Try with `./pyjbox.py pyjls` and so on (from the project's root folder).
 
 ### Launching scripts
 
@@ -37,9 +38,7 @@ in "compact format" (which minimises whitespace).
 For example, let's create a JSON document from a list of numbers:
 
 ```
-
     > seq 1 10|./pyjbox.py pyjarray
-    
 ```
 
 Will emit `[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]` (Notice here: The list elements are numeric).
@@ -47,9 +46,7 @@ Will emit `[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]` (Notice here: The list elements are 
 Passing this through "unarray" brings us back to the original document in this example:
 
 ```
-
     > seq 1 10|./pyjbox.py pyjarray|./pyjbox.py pyjunarray
-
 ```
 
 Will emit

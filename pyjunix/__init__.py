@@ -14,6 +14,8 @@ import pwd
 import datetime
 import argparse
 import jsonpath2
+import psutil
+
 
 import pdb
 
@@ -538,3 +540,22 @@ class PyJSort(BasePyJUnixFunction):
             index=list(zip(query_results, stdin_data))
         
         return json.dumps(list(map(lambda x:x[1], sorted(index, key=lambda x:x[0], reverse = self.script_args.reverse))))
+
+class PyJPs(BasePyJUnixFunction):
+    """
+    Returns a process list.
+    """
+    
+    def on_get_parser(self):
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjps", description="Returns a list of current processes.")
+        return ret_parser
+        
+    def on_exec_over_params(self, before_exec_result, *args, **kwargs):
+        current_processes = [u.as_dict() for u in psutil.process_iter()]
+        # Filter processes for the current user
+        current_user_processes = list(filter(lambda x:x["username"] == pwd.getpwuid(os.getuid()).pw_name, current_processes))
+        result = list(map(lambda x:{"PID":x["pid"], 
+                               "TTY":x["terminal"], 
+                               "TIME":datetime.datetime.fromtimestamp(x["create_time"]).isoformat(), 
+                               "CMD":" ".join(x["cmdline"])}, current_user_processes))
+        return json.dumps(result)

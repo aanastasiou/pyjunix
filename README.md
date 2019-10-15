@@ -9,6 +9,7 @@ Scripts implemented so far:
 * `pyjgrep`
 * `pyjprtprn`
 * `pyjsort`
+* `pyjps`
 
 ## Installation
 
@@ -148,6 +149,13 @@ Sorting more complex data structures is possible with `jsonpath`:
 
 Here, `pyjls` will produce a directory listing which `pyjsort` will sort by the attribute `item`.
 
+### PyJPs
+
+Similarly to `ps`, returns a list of the currently running processes.
+
+```
+    > ./pyjbox.py pyjps
+```
 
 ### PyJPrtPrn
 

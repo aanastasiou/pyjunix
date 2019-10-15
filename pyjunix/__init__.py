@@ -568,6 +568,8 @@ class PyJLast(BasePyJUnixFunction):
         * addr1   : //
         * addr2   : //
         * addr3   : Internet address of remote host.
+        
+        * For more information see `here <https://linux.die.net/man/5/utmp>`_
     """
     
     def on_get_parser(self):
@@ -577,14 +579,8 @@ class PyJLast(BasePyJUnixFunction):
         return ret_parser
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
-        result = []
-        with open(self.script_args.file, "rb") as fd:
-            data = fd.read()
-        if self.script_args.limit < 0:
-            result = [u._asdict() for u in utmp.read(data)]
-        else:
-            result = [next(utmp.read(data))._asdict() for k in range(0, self.script_args.limit)]
         # Translate the type
+        # See https://linux.die.net/man/5/utmp
         type_lookup = {0: "EMPTY", 
                        1: "RUN_LVL", 
                        2: "BOOT_TIME", 
@@ -595,7 +591,16 @@ class PyJLast(BasePyJUnixFunction):
                        7: "USER_PROCESS",
                        8: "DEAD_PROCESS",
                        9: "ACCOUNTING"}
+        result = []
         
+        with open(self.script_args.file, "rb") as fd:
+            data = fd.read()
+        
+        if self.script_args.limit < 0:
+            result = [u._asdict() for u in utmp.read(data)]
+        else:
+            result = [next(utmp.read(data))._asdict() for k in range(0, self.script_args.limit)]
+        # TODO: HIGH, Need a JSONCodec that resolves datetimes properly so that they become computable too.
         for an_item in result:
             an_item.update({"type":type_lookup[an_item["type"]],
                             "sec_date":datetime.datetime.fromtimestamp(an_item["sec"]).isoformat()})

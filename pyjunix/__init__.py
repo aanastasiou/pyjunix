@@ -548,6 +548,10 @@ class PyJJoin(BasePyJUnixFunction):
     -v FILENUM, like a but suppress the joined ones.
     -1 jsonpath of the field to join from the first json file
     -2 jsonpath of the field to join from the second json file
+    
+    Must be arrays of objects.
+    Remove the matched field and then update the joining dicts.
+    Or prefix everything just like the join of pandas does.
     """
     
     def on_get_parser(self):

@@ -548,12 +548,15 @@ class PyJJoin(BasePyJUnixFunction):
     -v FILENUM, like a but suppress the joined ones.
     -1 jsonpath of the field to join from the first json file
     -2 jsonpath of the field to join from the second json file
-    -j FIELD (equivalent to -1 FIELD -2 FIELD).    
     """
     
     def on_get_parser(self):
         ret_parser = PyJCommandLineArgumentParser(prog="pyjjoin", description="Joins two JSON documents on specific fields.")
+        ret_parser.add_argument("-a", dest="include_unpairable_items_from", type=int, default=-1, help="Include unpairable items from file 1 or 2")
+        ret_parser.add_argument("-v", dest="suppress_joined_items_from", type=int, default=-1, help="Similar to -a but indicating which file's items to suppress")
+        ret_parser.add_argument("-1", dest="file_1_key", type=str, default="", help="jsonpath READ expression that determines the attribute to use as a key for the first file")
+        ret_parser.add_argument("-2", dest="file_2_key", type=str, default="", help="jsonpath READ expression that determines the attribute to use as a key for the second file")
         return ret_parser
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
-        return []
+        return json.dumps({"file_1_key":self.script_args.file_1_key})

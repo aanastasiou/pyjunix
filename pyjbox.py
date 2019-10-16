@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from pyjunix import PyJArray, PyJUnArray, PyJLs, PyJKeys, PyJGrep, PyJPrtPrn, PyJSort
+from pyjunix import PyJArray, PyJUnArray, PyJLs, PyJKeys, PyJGrep, PyJPrtPrn, PyJSort, PyJJoin
 
 script_dir = {"pyjarray": PyJArray, 
               "pyjunarray": PyJUnArray,
@@ -8,7 +8,8 @@ script_dir = {"pyjarray": PyJArray,
               "pyjkeys": PyJKeys,
               "pyjgrep": PyJGrep,
               "pyjprtprn": PyJPrtPrn,
-              "pyjsort": PyJSort} 
+              "pyjsort": PyJSort,
+              "pyjjoin": PyJJoin} 
 
 
 if __name__ == "__main__":

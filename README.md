@@ -9,6 +9,7 @@ Scripts implemented so far:
 * `pyjgrep`
 * `pyjprtprn`
 * `pyjsort`
+* `pyjjoin`
 
 ## Installation
 
@@ -147,6 +148,10 @@ Sorting more complex data structures is possible with `jsonpath`:
 ```
 
 Here, `pyjls` will produce a directory listing which `pyjsort` will sort by the attribute `item`.
+
+### PyJJoin
+
+Join two files on specific keys.
 
 
 ### PyJPrtPrn

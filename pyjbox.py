@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from pyjunix import PyJArray, PyJUnArray, PyJLs, PyJKeys, PyJGrep, PyJPrtPrn, PyJSort, PyJLast
+from pyjunix import PyJArray, PyJUnArray, PyJLs, PyJKeys, PyJGrep, PyJPrtPrn, PyJSort, PyJLast, PyJPs
 
 script_dir = {"pyjarray": PyJArray, 
               "pyjunarray": PyJUnArray,
@@ -9,8 +9,8 @@ script_dir = {"pyjarray": PyJArray,
               "pyjgrep": PyJGrep,
               "pyjprtprn": PyJPrtPrn,
               "pyjsort": PyJSort,
-              "pyjlast": PyJLast} 
-
+              "pyjlast": PyJLast, 
+              "pyjps": PyJPs} 
 
 if __name__ == "__main__":
     # Complain if pyjbox doesn't know what to do.

@@ -15,6 +15,10 @@ import datetime
 import argparse
 import jsonpath2
 import utmp
+import psutil
+
+
+import pdb
 
 
 class PyJUnixException(Exception):
@@ -604,5 +608,122 @@ class PyJLast(BasePyJUnixFunction):
         for an_item in result:
             an_item.update({"type":type_lookup[an_item["type"]],
                             "sec_date":datetime.datetime.fromtimestamp(an_item["sec"]).isoformat()})
+                            
+        return json.dumps(result)
             
+
+class PyJPs(BasePyJUnixFunction):
+    """
+    Returns a simple process list.
+    
+    By default, it returns processes associated with the current user and terminal.
+    
+    * Optional parameter `-e` returns information about all processes as this is accessible to `psutil`.
+    
+    **Note:**
+        
+        The traditional `ps`, has a very large amount of parameters to control the content and way of presenting it 
+        to the user. ``PyJUnix`` deviates (at least in this version) from that in two ways:
+        
+        1. It only provides the -e switch; and 
+        2. It returns the same attribute names as those used by ``psutil``
+        
+        In terms of customising the content (e.g. querying for a specific subset of processes), `PyJUnix` 
+        supplies `PyJGrep` and therefore it is possible to use that to filter the process list further. To do this 
+        it is necessary to know the format of the information returned by `PyJPs`. This is basically the structure of
+        ``Process`` specified by ``psutil`` `here <https://psutil.readthedocs.io/en/latest/#process-class>`_.
+        
+        When ``PyJPs`` is called without any paramters, it only outputs ``exe, create_time, pid, terminal``. 
+        
+        
+        The following is a synopsis of the wealth of information returned.
+        
+        * cmdline
+            * The ``sys.argv`` that was used to start the process.
+        * connections
+            * Socket connections opened by the process.
+        * cpu_affinity
+            * The CPU(s) the process can run on.
+        * cpu_num"
+            * The CPU the process is currently running on.
+        * cpu_percent
+            * Percent utilisation
+        * cpu_times
+            * user, system, children_user, system_user, iowait times
+        * create_time
+            * Timestamp of the time the process was created.
+            * **Note:** In ``PyJUnix``, this would be expressed in isoformat.
+            
+        * cwd
+            * Current working directory
+            
+        * environ
+            * Environment variables of the process
+        * exe
+            * The executable that started the process.
+            
+        * gids
+            * The real, effective and saved group ids of this process.
+        * ionice
+            * I/O priority
+        * memory_full_info
+            * Effective memory use
+        * memory_info
+            * Complete dump of all different aspects of memory use (e.g. Resident Set Size, Virtual Memory Size, etc)
+        * memory_maps
+            * Process memory mapped regions.
+        * memory_percent
+            * Percentage of process memory to total available memory
+        * name
+            * Process name
+        * nice
+            * Process priority (execution)
+        * num_ctx_switches
+            * The number of voluntary and involuntary context switches performed by this process
+        * num_fds
+            * Number of files currently opened by this process.
+        * num_threads
+            * Self explanatory
+        * open_files
+            * Files currently opened by this process (including their full path and file descriptor information),
+        * pid
+            * Process ID
+        * ppid
+            * Process parent ID
+        * status
+            * sleeping, running, stopped, dead, zombie, etc
+        * terminal
+            * The terminal the process is attached to
+        * threads
+            * Nested list of all threads owned by the current process and their CPU times (user/system).
+        * uids
+            * List of real saved and effective user IDs
+        * username
+            * String username as it is known to the system
+    """
+    
+    def on_get_parser(self):
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjps", description="Returns a list of current processes.")
+        ret_parser.add_argument("-e", action="store_true", default=False, dest="show_all", help="Show all processes")
+        return ret_parser
+        
+    def on_exec_over_params(self, before_exec_result, *args, **kwargs):
+        current_username = pwd.getpwuid(os.getuid()).pw_name 
+        current_terminal = os.ttyname(sys.stderr.fileno())
+        current_processes = [u.as_dict() for u in psutil.process_iter()]
+        # Filter processes for the current user and terminal
+        if not self.script_args.show_all:
+            filtered_processes = list(filter(lambda x:x["username"] == current_username and 
+                                                      x["terminal"] == current_terminal, current_processes))
+            result = list(map(lambda x:{"pid":x["pid"], 
+                                           "terminal":x["terminal"], 
+                                           "create_time":datetime.datetime.fromtimestamp(x["create_time"]).isoformat(), 
+                                           "exe":x["exe"]}, filtered_processes))
+        else:
+            # We still need to change the format of the date right here.
+            result = []
+            for an_item in current_processes:
+                an_item.update({"create_time": datetime.datetime.fromtimestamp(an_item["create_time"]).isoformat()})
+                result.append(an_item)
+        
         return json.dumps(result)

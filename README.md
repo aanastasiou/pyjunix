@@ -10,6 +10,7 @@ Scripts implemented so far:
 * `pyjprtprn`
 * `pyjsort`
 * `pyjlast`
+* `pyjps`
 
 ## Installation
 
@@ -158,6 +159,13 @@ Here, `pyjls` will produce a directory listing which `pyjsort` will sort by the 
 Returns information about the users last logged in to the system as a JSON list of records with full information on 
 which username was logged in to the system from which device / host and at what time.
 
+### PyJPs
+
+Similarly to `ps`, returns a list of the currently running processes.
+
+```
+    > ./pyjbox.py pyjps
+```
 
 ### PyJPrtPrn
 

@@ -33,3 +33,5 @@ Main functionality
 .. autoclass:: pyjunix.PyJSort
 
 .. autoclass:: pyjunix.PyJLast
+
+.. autoclass:: pyjunix.PyJPs

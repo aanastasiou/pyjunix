@@ -1,6 +1,15 @@
 Notes on junix
 ==============
 
+Dates & Timestamps
+------------------
+
+Throughout ``PyJUnix``, timestamps are converted to standard `ISO 8601 <https://en.wikipedia.org/wiki/ISO_8601>`_ 
+formatted date strings. 
+
+At the moment, these strings cannot be queried as dates. This capability will be added soon by marshaling the dates 
+in an appropriate way so that they can still be queryable through ``jsonpath``.
+ 
 grep is XPath
 -------------
 

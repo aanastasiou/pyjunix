@@ -35,3 +35,5 @@ Main functionality
 .. autoclass:: pyjunix.PyJLast
 
 .. autoclass:: pyjunix.PyJPs
+
+.. autoclass:: pyjunix.PyJJoin

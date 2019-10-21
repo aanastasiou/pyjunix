@@ -1,17 +1,71 @@
-Notes on junix
-==============
+Notes on PyJUnix
+================
 
-Dates & Timestamps
-------------------
+At the moment, these notes are not in any particular order and are collected progressively as I am gradually 
+working over the functionality of each script. 
 
-Throughout ``PyJUnix``, timestamps are converted to standard `ISO 8601 <https://en.wikipedia.org/wiki/ISO_8601>`_ 
-formatted date strings. 
 
-At the moment, these strings cannot be queried as dates. This capability will be added soon by marshaling the dates 
-in an appropriate way so that they can still be queryable through ``jsonpath``.
- 
-grep is XPath
--------------
+``join`` should become more specific
+------------------------------------
+
+The original intent of ``join`` is to join ``CSV`` type of files. In those files, data is assumed to be formatted 
+in rows and columns with a possible header on the first line of either file.
+
+However, if either of the files is ``JSON`` then items can be organised as:
+
+1. Lists of lists
+2. Lists of primitives
+3. Lists of objects
+
+In each of these cases, there are three problems that have to be addressed:
+
+1. How to locate and form the index
+2. How to perform the matching
+3. How to combine the matched items
+
+And ideally, it should also be possible to join any of the above combinations (e.g. list of lists to a list of objects)
+
+The current implementation operates over files/``stdin`` that are formated as list of lists. However the rest of the 
+options are very attractive for ``PyJUnix`` as well. Here is a preliminary list of options / choices:
+
+1. List of lists (current)
+    1. Locate index by its zero-based index
+    2. Match by forming an index Map of zero-base indexed column value --> list of items sharing the same value
+    3. Combine the two by list extension, making sure to remove the index from the matched item.
+    
+2. List of primitives (with a single column)
+    1. The index is the item index. For example, for an input of ``[42, 2, 1]``, the index is assumed to be
+       ``[[0,42], [1,2], [2,1]]``.
+    2. The matching is performed as per the *List of lists* section
+    3. The combination is performed as per the *List of lists* section
+        * Inputs ``[0,1,55]`` and ``[3,3,3]`` would produce ``[[0,3],[1,3],[55,3]]``, **but** inputs 
+          ``[[0, 22], [0, 54],[1, 89]]`` and ``[42, 44, 38]`` would produce ``[[0, 22, 42], [0, 54, 42], [1, 89, 44]]``
+          
+3. List of objects
+    1. The index can be named
+    2. The matching is performed in exactly the same way (in code) as the first case
+    3. The combination is perfomed by excluding the index attribute and ``update`` ing the temporary dictionaries.
+    
+
+Joining different data types
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Combinations of the above cases are not straightforward to resolve, especially when it comes to **combining** data 
+types. For example, having matched ``dict`` to ``list``, how should the combination be performed? By copy or
+combination?
+
+
+Further notes
+^^^^^^^^^^^^^
+
+1. Could it be possible to *pull* the index via ``jsonpath`` (?)
+2. Could it be possible to allow the user to specify the format by letting them specify an inline lambda function as
+   ``lambda x,y:`` where ``x,y`` are the matched items from files 1 and 2 (?)
+
+
+
+``grep`` is XPath
+-----------------
 
 * Grep is easy if you treat it as `XPath <https://en.wikipedia.org/wiki/XPath>`_. 
   That is, just as ``grep`` applies regexp as a "query language" over "string documents", so is XPath a query language 
@@ -21,8 +75,8 @@ grep is XPath
   `jsonpath2 <https://github.com/pacifica/python-jsonpath2>`_ for Python.
 
 
-ls output is nested lists
--------------------------
+``ls`` output is nested lists
+-----------------------------
 
 * If ``ls`` is not formatted as a set of nested lists, it is very difficult to query it with ``PyJGrep`` later on.
   Every mapping would be an object.
@@ -36,6 +90,16 @@ Need for a schema validator
 * A script that validates JSON according to some JSON schema document and can be used in ``test``
 * This is relatively easy by using an existing jsonschema module
 * Its output could be a minimal well formed JSON document
+
+
+Dates & Timestamps
+------------------
+
+Throughout ``PyJUnix``, timestamps are converted to standard `ISO 8601 <https://en.wikipedia.org/wiki/ISO_8601>`_ 
+formatted date strings. 
+
+At the moment, these strings cannot be queried as dates. This capability will be added soon by marshaling the dates 
+in an appropriate way so that they can still be queryable through ``jsonpath``.
 
 
 Data volume and streaming

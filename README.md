@@ -11,6 +11,7 @@ Scripts implemented so far:
 * `pyjsort`
 * `pyjlast`
 * `pyjps`
+* `pyjjoin`
 
 ## Installation
 
@@ -167,6 +168,69 @@ Similarly to `ps`, returns a list of the currently running processes.
     > ./pyjbox.py pyjps
 ```
 
+### PyJJoin
+
+Join two JSON files that are formated as lists of lists on a common (zero-based) index.
+
+Given files:
+
+```
+    file_1.json
+    [
+        [1, "Alpha"],
+        [2, "Beta"],
+        [2, "Gamma"],
+        [42, "Gamma"]
+    ]
+```
+
+and
+
+```
+    file_2.json
+    [
+        [1, "Pingo"],
+        [2, "Pango"],
+        [24, "Flop"]
+    ]
+```
+
+Then:
+
+```
+    > ./pyjbox pyjjoin file_1.json file_2.json
+```
+
+Would result in:
+
+```
+    [
+        [1, "Alpha", "Pingo"],
+        [2, "Beta", "Pango"],
+        [2, "Gamma", "Pango"]
+    ]
+```
+
+Adding `-v 1` would suppress the matched entries and only output:
+
+```
+    [
+        [42, "Gamma"]
+    ]
+```
+
+(Conversely, `[42, "Gamma"]` would become `[24, "Flop"]` if `-v 2`)
+
+Adding `-a 1` or `-a 2` would simply add the above unmatched entries to the array of the matched ones.
+
+By default the attribute the join is performed on is 0, add `-1 NUM` and/or `-2 NUM` to change that.
+
+**Note:** At the moment the script operates over lists of lists and will likely also work over lists of objects with 
+`-1 attribute` denoting the attribute to join on. However, I would like to add a generic way to join on arbitrary 
+`jsonpath` exceptions, irrespectively of the data type of either of the matched items. Will have a better idea by 
+the next release. See [doc/source/junix_notes.rst](doc/source/junix_notes.rst) for more details
+
+
 ### PyJPrtPrn
 
 Pretty print output. This is usually the last script in a piped chain of scripts.
@@ -186,7 +250,7 @@ Human readable form:
     > ./pyjbox.py pyjls|./pyjbox.py pyjprtprn
 ```
 
-## More information
+## Where to next?
 
-For more details on this project checkout the documentation in 'doc/' as well as 
+For many more details on each script checkout the documentation in 'doc/' as well as 
 Eric Fischer's original [junix spec repository](https://github.com/ericfischer/junix).

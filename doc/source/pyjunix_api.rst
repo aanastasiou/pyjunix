@@ -7,10 +7,10 @@ PyJUnix API
 Core Objects
 ------------
 
-.. autoclass:: pyjunix.PyJCommandLineArgumentParser
+.. autoclass:: pyjunix.core.PyJCommandLineArgumentParser
     :members:
     
-.. autoclass:: pyjunix.BasePyJUnixFunction
+.. autoclass:: pyjunix.core.BasePyJUnixFunction
     :members:
     
 .. _current_imp_status:

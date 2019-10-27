@@ -37,3 +37,5 @@ Main functionality
 .. autoclass:: pyjunix.PyJPs
 
 .. autoclass:: pyjunix.PyJJoin
+
+.. autoclass:: pyjunix.PyJCat

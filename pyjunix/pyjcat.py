@@ -1,4 +1,5 @@
 """
+Concatenates a set of JSON files containing lists of items.
 
 :authors: Athanasios Anastasiou
 :date: September 2019
@@ -13,6 +14,9 @@ from .core import BasePyJUnixFunction, PyJCommandLineArgumentParser
 
 class PyJCat(BasePyJUnixFunction):
     """
+    Concatenates the contents of 1 or more JSON files.
+    
+    Notice here that these JSON files should contain lists.
     """
     
     def on_get_parser(self):

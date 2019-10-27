@@ -6,6 +6,7 @@ certifi==2019.9.11
 chardet==3.0.4
 Click==7.0
 decorator==4.4.0
+deepdiff==4.0.8
 docutils==0.15.2
 idna==2.8
 imagesize==1.1.0
@@ -15,7 +16,9 @@ jedi==0.15.1
 Jinja2==2.10.1
 jsonpath==0.82
 jsonpath2==0.4.1
+jsonpickle==1.2
 MarkupSafe==1.1.1
+ordered-set==3.1.1
 packaging==19.2
 parso==0.5.1
 pexpect==4.7.0

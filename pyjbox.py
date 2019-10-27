@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from pyjunix import PyJKeys, PyJArray, PyJUnArray, PyJLs, PyJGrep, PyJPrtPrn, PyJSort, PyJLast, PyJPs, PyJJoin
+from pyjunix import PyJKeys, PyJArray, PyJUnArray, PyJLs, PyJGrep, PyJPrtPrn, PyJSort, PyJLast, PyJPs, PyJJoin, PyJCat
              
 script_dir = {
               "pyjkeys": PyJKeys,
@@ -12,7 +12,8 @@ script_dir = {
               "pyjsort": PyJSort,
               "pyjlast": PyJLast,
               "pyjps": PyJPs,
-              "pyjjoin": PyJJoin
+              "pyjjoin": PyJJoin,
+              "pyjcat": PyJCat,
               } 
 
 

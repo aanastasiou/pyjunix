@@ -8,6 +8,7 @@ Sets up the core objects fro PyJUnix such as the base object for commands and th
 
 import sys
 import json
+import io
 import argparse
 
 
@@ -28,19 +29,21 @@ class PyJCommandLineArgumentParser(argparse.ArgumentParser):
     def parse_args(self, args = None, namespace = None):
         
         def process_item(item_value):
-            if item_value.startswith(":"):
-                return json.loads(item_value[1:])
-            else:
-                # TODO: HIGH, I am trying to avoid a regexp validation here but maybe it is impossible.
-                #       Revise that `isprintable`
-                strp_value = item_value.lstrip("\"").rstrip("\"")
-                if strp_value.isnumeric():
-                    return json.loads(strp_value)
-                elif strp_value.isprintable():
-                    return json.loads("\"%s\"" % strp_value)
+            if not isinstance(item_value, io.IOBase):
+                if item_value.startswith(":"):
+                    return json.loads(item_value[1:])
                 else:
-                    # TODO: HIGH, At this point we should raise an exception that this input is invalid.
-                    pass
+                    # TODO: HIGH, I am trying to avoid a regexp validation here but maybe it is impossible.
+                    #       Revise that `isprintable`
+                    strp_value = item_value.lstrip("\"").rstrip("\"")
+                    if strp_value.isnumeric():
+                        return json.loads(strp_value)
+                    elif strp_value.isprintable():
+                        return json.loads("\"%s\"" % strp_value)
+                    else:
+                        # TODO: HIGH, At this point we should raise an exception that this input is invalid.
+                        pass
+            return item_value
                     
         parsed_args_result = super().parse_args(args, namespace)
         sub_values = {}

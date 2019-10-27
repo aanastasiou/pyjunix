@@ -39,3 +39,5 @@ Main functionality
 .. autoclass:: pyjunix.PyJJoin
 
 .. autoclass:: pyjunix.PyJCat
+
+.. autoclass:: pyjunix.PyJPaste

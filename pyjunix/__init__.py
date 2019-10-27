@@ -17,3 +17,4 @@ from .pyjlast import PyJLast
 from .pyjps import PyJPs
 from .pyjjoin import PyJJoin
 from .pyjpaste import PyJPaste
+from .pyjcat import PyJCat

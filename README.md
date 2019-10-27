@@ -12,6 +12,7 @@ Scripts implemented so far:
 * `pyjlast`
 * `pyjps`
 * `pyjjoin`
+* `pyjcat`
 
 ## Installation
 
@@ -229,6 +230,10 @@ By default the attribute the join is performed on is 0, add `-1 NUM` and/or `-2 
 `-1 attribute` denoting the attribute to join on. However, I would like to add a generic way to join on arbitrary 
 `jsonpath` exceptions, irrespectively of the data type of either of the matched items. Will have a better idea by 
 the next release. See [doc/source/junix_notes.rst](doc/source/junix_notes.rst) for more details
+
+### PyJCat
+
+Simply concatenates the contents of two or more JSON files that should contain lists.
 
 
 ### PyJPrtPrn

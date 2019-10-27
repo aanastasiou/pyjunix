@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
-from pyjunix import PyJKeys, PyJArray, PyJUnArray, PyJLs, PyJGrep, PyJPrtPrn, PyJSort, PyJLast, PyJPs, PyJJoin, PyJPaste
-             
+from pyjunix import (PyJKeys, PyJArray, PyJUnArray, PyJLs, PyJGrep, PyJPrtPrn, 
+                     PyJSort, PyJLast, PyJPs, PyJJoin, PyJPaste, PyJCat)
 script_dir = {
               "pyjkeys": PyJKeys,
               "pyjarray": PyJArray,
@@ -13,7 +13,8 @@ script_dir = {
               "pyjlast": PyJLast,
               "pyjps": PyJPs,
               "pyjjoin": PyJJoin,
-              "pyjpaste": PyJPaste
+              "pyjpaste": PyJPaste,
+              "pyjcat": PyJCat,
               } 
 
 

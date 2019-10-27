@@ -24,4 +24,22 @@ class PyJPaste(BasePyJUnixFunction):
         return ret_parser
         
     def on_exec_over_params(self, before_exec_result, *args, **kwargs):
-        return json.dumps([1,2])
+        json_file_data = [json.load(fd) for fd in self.script_args.files]
+        len_json_file_data = len(json_file_data)
+        done = False
+        k = 0
+        files_done=set()
+        to_ret = []
+        
+        while not done:
+            row_data = []
+            for a_file in enumerate(json_file_data):
+                try:
+                    row_data.extend(a_file[1][k])
+                except IndexError:
+                    files_done.add(a_file[0])
+            to_ret.append(row_data)
+            k+=1
+            done = len(files_done) == len_json_file_data
+        
+        return json.dumps(to_ret)

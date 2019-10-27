@@ -13,6 +13,7 @@ Scripts implemented so far:
 * `pyjps`
 * `pyjjoin`
 * `pyjcat`
+* `pyjpaste`
 
 ## Installation
 
@@ -235,6 +236,10 @@ the next release. See [doc/source/junix_notes.rst](doc/source/junix_notes.rst) f
 
 Simply concatenates the contents of two or more JSON files that should contain lists.
 
+### PyJPaste
+
+Given two or more JSON files that are formatted as list-of-lists or list-of-objects, it returns on list where each 
+element is the concatenation (or extension) of each list element (or object). 
 
 ### PyJPrtPrn
 

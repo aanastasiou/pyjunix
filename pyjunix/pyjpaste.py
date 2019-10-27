@@ -42,4 +42,4 @@ class PyJPaste(BasePyJUnixFunction):
             k+=1
             done = len(files_done) == len_json_file_data
         
-        return json.dumps(to_ret)
+        return json.dumps(to_ret[0:-1])

@@ -18,3 +18,4 @@ from .pyjps import PyJPs
 from .pyjjoin import PyJJoin
 from .pyjpaste import PyJPaste
 from .pyjcat import PyJCat
+from .pyjsplit import PyJSplit

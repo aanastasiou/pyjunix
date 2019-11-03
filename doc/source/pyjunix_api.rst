@@ -41,3 +41,5 @@ Main functionality
 .. autoclass:: pyjunix.PyJCat
 
 .. autoclass:: pyjunix.PyJPaste
+
+.. autoclass:: pyjunix.PyJSplit

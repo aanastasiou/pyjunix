@@ -14,6 +14,7 @@ Scripts implemented so far:
 * `pyjjoin`
 * `pyjcat`
 * `pyjpaste`
+* `pyjsplit`
 
 ## Installation
 
@@ -240,6 +241,19 @@ Simply concatenates the contents of two or more JSON files that should contain l
 
 Given two or more JSON files that are formatted as list-of-lists or list-of-objects, it returns on list where each 
 element is the concatenation (or extension) of each list element (or object). 
+
+### PyJSplit
+
+Splits a JSON file that is formated as a `list<any>` to one or more files containing a least number of items.
+
+```
+    > seq 0 100|./pyjbox.py pyjarray|./pyjbox.py pyjsplit - -l 10 --additional-suffix .json -d --prefix result_ 
+```
+
+This sequence of commands will produce 11 files, named `result_<dd>.json` (where dd is a number from `00` to `10`) 
+containing a list of at least 10 numbers.
+
+Notice the use of `-` to take input from `stdin`.
 
 ### PyJPrtPrn
 

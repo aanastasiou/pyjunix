@@ -15,6 +15,8 @@ Scripts implemented so far:
 * `pyjcat`
 * `pyjpaste`
 * `pyjsplit`
+* `pyjdiff`
+
 
 ## Installation
 
@@ -177,25 +179,27 @@ Join two JSON files that are formated as lists of lists on a common (zero-based)
 
 Given files:
 
+* **file_1.json**:
+
 ```
-    file_1.json
-    [
-        [1, "Alpha"],
-        [2, "Beta"],
-        [2, "Gamma"],
-        [42, "Gamma"]
-    ]
+  [
+      [1, "Alpha"],
+      [2, "Beta"],
+      [2, "Gamma"],
+      [42, "Gamma"]
+  ]
 ```
 
 and
 
+* **file_2.json**:
+
 ```
-    file_2.json
-    [
-        [1, "Pingo"],
-        [2, "Pango"],
-        [24, "Flop"]
-    ]
+  [
+      [1, "Pingo"],
+      [2, "Pango"],
+      [24, "Flop"]
+  ]
 ```
 
 Then:
@@ -240,7 +244,53 @@ Simply concatenates the contents of two or more JSON files that should contain l
 ### PyJPaste
 
 Given two or more JSON files that are formatted as list-of-lists or list-of-objects, it returns on list where each 
-element is the concatenation (or extension) of each list element (or object). 
+element is the concatenation (or extension) of each list element (or object).
+
+### PyJDiff
+
+Runs a ``diff`` over two data structures described by the JSON files and returns a JSON data structure describing their
+differences.
+
+Given files:
+
+* **file_1.json**:
+
+```
+  {
+      "Alpha":1,
+      "Beta":[1,2],
+      "Gamma":{}
+  }
+```
+
+and
+
+* **file_2.json:**:
+
+```
+  {
+      "Alpha":1,
+      "Beta":[1,2,3],
+      "Gamma":{}
+  }
+```
+
+running ``pyjdiff`` with:
+
+```
+    > ./pyjbox.py pyjdiff file_./pyjbox.py pyjdiff file_1.json
+```
+
+would return:
+
+```
+{
+    "iterable_item_added": {
+        "root['Beta'][2]": 3
+    }
+
+}
+```
 
 ### PyJSplit
 

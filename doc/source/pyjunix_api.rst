@@ -43,3 +43,5 @@ Main functionality
 .. autoclass:: pyjunix.PyJPaste
 
 .. autoclass:: pyjunix.PyJSplit
+
+.. autoclass:: pyjunix.PyJDiff

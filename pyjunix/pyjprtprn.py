@@ -8,7 +8,7 @@ PyJPrtPrn applies Pretty Print over JSON in compact form.
 
 import sys
 import json
-from .core import BasePyJUnixFunction, PyJUnixException
+from .core import BasePyJUnixFunction, PyJUnixException, PyJCommandLineArgumentParser
 
 class PyJPrtPrn(BasePyJUnixFunction):
     """

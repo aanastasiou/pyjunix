@@ -5,6 +5,13 @@ At the moment, these notes are not in any particular order and are collected pro
 working over the functionality of each script. 
 
 
+``pyjdiff`` output could move from Python acessors to ``jsonpath``
+------------------------------------------------------------------
+
+At the moment, the output from ``pyjdiff`` relies purely on ``DeepDiff`` which expresses location changes through 
+"normal" Python accessors. However, as ``pyjunix`` uses ``jsonpath`` elsewhere, it would be great to parse the output
+of ``DeepDiff`` as a post-processing step and convert all locations to ``jsonpath`` strings.
+
 ``join`` should become more specific
 ------------------------------------
 

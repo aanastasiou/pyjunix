@@ -2,7 +2,7 @@
 import sys
 from pyjunix import (PyJKeys, PyJArray, PyJUnArray, PyJLs, PyJGrep, PyJPrtPrn, 
                      PyJSort, PyJLast, PyJPs, PyJJoin, PyJPaste, PyJCat, PyJSplit, 
-                     PyJDiff)
+                     PyJDiff, PyJUniq)
 
 script_dir = {
               "pyjkeys": PyJKeys,
@@ -19,6 +19,7 @@ script_dir = {
               "pyjcat": PyJCat,
               "pyjsplit": PyJSplit,
               "pyjdiff": PyJDiff,
+              "pyjuniq": PyJUniq,
               } 
 
 

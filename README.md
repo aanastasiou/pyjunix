@@ -16,7 +16,7 @@ Scripts implemented so far:
 * `pyjpaste`
 * `pyjsplit`
 * `pyjdiff`
-
+* `pyjuniq`
 
 ## Installation
 
@@ -304,6 +304,24 @@ This sequence of commands will produce 11 files, named `result_<dd>.json` (where
 containing a list of at least 10 numbers.
 
 Notice the use of `-` to take input from `stdin`.
+
+### PyJUniq
+
+Returns unique items from a list of items. It expects its input formatted as a list and it can operate either via an 
+implicit list of arguments or a list JSON object loaded from ``stdin``.
+
+```
+    > ./pyjbox.py pyjuniq "Alpha" "Beta" "Gamma" "Gamma" "Alpha" "Beta"
+```
+
+Would produce
+
+```
+    ["Alpha", "Beta","Gamma"]
+```
+
+The script can also output only duplicate or unique items and a form that also includes the number of items encountered
+in the list.
 
 ### PyJPrtPrn
 

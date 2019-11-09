@@ -20,3 +20,4 @@ from .pyjpaste import PyJPaste
 from .pyjcat import PyJCat
 from .pyjsplit import PyJSplit
 from .pyjdiff import PyJDiff
+from .pyjuniq import PyJUniq

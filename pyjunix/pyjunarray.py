@@ -15,6 +15,19 @@ class PyJUnArray(BasePyJUnixFunction):
     Unpacks a JSON object from a list to a newline delineated list of items.
     
     Anything other than a list as input to ``PyJUnArray`` is an error condition.
+    
+    ::
+    
+        usage: pyjunarray [-h] [cli_vars [cli_vars ...]]
+
+        Unpacks JSON objects from an array.
+
+        positional arguments:
+          cli_vars    List of arrays to unpack to a JSON array.
+
+        optional arguments:
+          -h, --help  show this help message and exit
+
     """
     
     def on_get_parser(self):

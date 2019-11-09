@@ -17,11 +17,20 @@ class PyJGrep(BasePyJUnixFunction):
     """
     Performs grep by applying the XPath equivalent to a JSON document.
     
-    It accepts a jsonpath query string and zero or more command line parameters. In this case, it evaluates the 
-    query string on each content item passed as a command line parameter and returns its result in an array.
+    ::
     
-    When operating over ``stdin``, it assumes a single properly formatted document at its input.
-    
+        usage: pyjgrep [-h] jsonpath_pattern [cli_vars [cli_vars ...]]
+
+        Performs grep over JSON documents using jsonpath.
+
+        positional arguments:
+          jsonpath_pattern  The jsonpath query string. (See https://github.com/json-
+                            path/JsonPath).
+          cli_vars          Zero or more JSON objects to run the query over.
+
+        optional arguments:
+          -h, --help        show this help message and exit
+
     By definition, PyJGrep should return lists as its result is produced by iterative application of the query string 
     over its command line parameters (for example). However, if the result of a query is a single item list, the content
     of that item is returned rather than the list. This saves additional ``pyjunix`` script invocation later on, to 

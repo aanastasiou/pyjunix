@@ -15,6 +15,19 @@ class PyJArray(BasePyJUnixFunction):
     Packs JSON objects in its input to a JSON array
     
     When operating over ``stdin``, it is assumed that the input is a newline delineated list of JSON items.
+    
+    ::
+    
+        usage: pyjarray [-h] [cli_vars [cli_vars ...]]
+
+        Packs objects in its input to a JSON array
+
+        positional arguments:
+          cli_vars    Zero or more items to pack to an array.
+
+        optional arguments:
+          -h, --help  show this help message and exit
+
     """
     
     def on_get_parser(self):

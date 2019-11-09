@@ -22,6 +22,19 @@ class PyJPaste(BasePyJUnixFunction):
     If the files contain lists of lists, parallel merging occurs list element by list element. That is, the first list 
     element of the output is the concatenation of each file's first element (and so on).
     If the files contain lists of objects, parallel merging is equivalent to a merge of each line's dictionaries.
+    
+    ::
+    
+        usage: pyjpaste [-h] files [files ...]
+
+        Pastes two or more JSON documents
+
+        positional arguments:
+          files       Files to paste.
+
+        optional arguments:
+          -h, --help  show this help message and exit
+
     """
     
     def on_get_parser(self):

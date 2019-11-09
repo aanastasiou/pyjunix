@@ -19,8 +19,17 @@ class PyJLast(BasePyJUnixFunction):
     The utmp, wtmp and btmp files store information on currently logged on, previously logged on and failed to log-in 
     users for a given system. These are found ``/var/log/``.
     
-    * Optional parameter ``-f`` enables parsing a different file than the default ``/var/log/wtmp``.
-    * Optional parameter ``-n`` sets a limit to the amount of entries to return.
+    ::
+    
+        usage: pyjlast [-h] [-n LIMIT] [-f FILE]
+
+        JSON listing of last logged in users.
+
+        optional arguments:
+          -h, --help            show this help message and exit
+          -n LIMIT, --limit LIMIT
+                                Number of entries to return.
+          -f FILE, --file FILE  File to parse.
     
     The format of each entry is as follows:
         * type    : Type of record. 

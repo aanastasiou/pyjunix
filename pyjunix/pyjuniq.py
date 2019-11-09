@@ -25,11 +25,20 @@ class PyJUniq(BasePyJUnixFunction):
     It expects its input formatted as a list and it can operate either via a list of arguments or a list JSON object 
     loaded from ``stdin``.
     
-    **Optional Parameters:**
+    ::
     
-      * ``-c`` Returns a map<value><int> of unique values at its input pointing to the count of occurence.
-      * ``-d`` Returns only duplicate items (one for each occurence)
-      * ``-u`` Returns only unique items
+        usage: pyjuniq [-h] [-c] [-d] [-u] [cli_vars [cli_vars ...]]
+
+        Returns unique items from a list of JSON objects.
+
+        positional arguments:
+          cli_vars        Zero or more JSON objects to apply uniq on.
+
+        optional arguments:
+          -h, --help      show this help message and exit
+          -c, --count     Prefix items by number of occurences (returns object)
+          -d, --repeated  Only return duplicate items, one for each occurence
+          -u, --unique    Only return unique items
       
     """
     

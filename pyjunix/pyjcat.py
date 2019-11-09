@@ -17,11 +17,24 @@ class PyJCat(BasePyJUnixFunction):
     Concatenates the contents of 1 or more JSON files.
     
     Notice here that these JSON files should contain lists.
+    
+    ::
+    
+        usage: pyjcat [-h] files [files ...]
+
+        Concatenates two or more JSON list documents.
+
+        positional arguments:
+          files       Files.
+
+        optional arguments:
+          -h, --help  show this help message and exit
+
     """
     
     def on_get_parser(self):
-        ret_parser = PyJCommandLineArgumentParser(prog="pyjjoin", description="Joins two JSON documents on specific "
-                                                  "fields.")
+        ret_parser = PyJCommandLineArgumentParser(prog="pyjcat", description="Concatenates two or more JSON "
+                                                  "list documents.")
         ret_parser.add_argument("files", nargs="+", type=argparse.FileType(mode="rt", encoding="utf-8"), 
                                 help="Files.")
         return ret_parser

@@ -17,17 +17,27 @@ class PyJSplit(BasePyJUnixFunction):
     Splits a JSON file that contains a ``list<any>`` to one or more files whose ``list<any>`` contain a least number of 
     items.
     
-    * **Mandatory parameters:**
-      
-      * ``json_file``: The file to split
+    ::
     
-    * **Optional parameters:**
-    
-      * ``--prefix``: The filename prefix to use, default to ``x``
-      * ``--additional-suffix``: Any additional suffix to add after the file "part number". Defaults to an empty string.
-      * ``-d``: Use numeric suffix (rather than "alphabetic")
-      * ``-l``: (Least) Number of items per split file
-      * ``--suffix-length``: The maximum length of the enumerated suffix. Defaults to 2.
+        usage: pyjsplit [-h] [--prefix PREFIX] [--additional-suffix ADDITIONAL_SUFFIX]
+                        [-d] [-l NUM_ITEMS] [-a SUFFIX_LENGTH]
+                        json_file
+
+        Splits a JSON document.
+
+        positional arguments:
+          json_file             File to split.
+
+        optional arguments:
+          -h, --help            show this help message and exit
+          --prefix PREFIX       File prefix
+          --additional-suffix ADDITIONAL_SUFFIX
+                                Additional suffix
+          -d                    Use numeric suffix
+          -l NUM_ITEMS          Number of items per generated file
+          -a SUFFIX_LENGTH, --suffix-length SUFFIX_LENGTH
+                                Suffix length
+                                
     """
     
     def on_get_parser(self):

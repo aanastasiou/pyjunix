@@ -17,11 +17,20 @@ class PyJSort(BasePyJUnixFunction):
     When called over command line arguments, it treats them as a list.
     When called over stdin, a valid JSON list must be passed as an argument.
     
-    Optional parameter -k (--key) specifies a jsonpath read query that is used to create an index. This
-    query could be pointing to the attribute of an arbitrarily complex object. This is equivalent to the way 
-    Python's ``sorted`` works, with its ``key`` parameter.
+    ::
     
-    Optional parameter -r (--reverse) specifies reverse sorting order.
+        usage: pyjsort [-h] [-k KEY] [-r] [cli_vars [cli_vars ...]]
+
+        Sorts items in its input.
+
+        positional arguments:
+          cli_vars           Zero or more JSON objects to sort. These are treated
+                             implicitly as a list.
+
+        optional arguments:
+          -h, --help         show this help message and exit
+          -k KEY, --key KEY  JSONPath to the key to be used for sorting items.
+          -r, --reverse      Sort in reverse order.
     
     """
     

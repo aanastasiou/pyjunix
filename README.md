@@ -2,21 +2,21 @@
 
 Scripts implemented so far:
 
-* `pyjkeys`
-* `pyjarray`
-* `pyjunarray`
-* `pyjls`
-* `pyjgrep`
-* `pyjprtprn`
-* `pyjsort`
-* `pyjlast`
-* `pyjps`
-* `pyjjoin`
-* `pyjcat`
-* `pyjpaste`
-* `pyjsplit`
-* `pyjdiff`
-* `pyjuniq`
+* [`pyjkeys`](#pyjkeys)
+* [`pyjarray`](#pyjarray--pyjunarray)
+* [`pyjunarray`](#pyjarray--pyjunarray)
+* [`pyjls`](#pyjls)
+* [`pyjgrep`](#pyjgrep)
+* [`pyjprtprn`](#pyjprtprn)
+* [`pyjsort`](#pyjsort)
+* [`pyjlast`](#pyjlast)
+* [`pyjps`](#pyjps)
+* [`pyjjoin`](#pyjjoin)
+* [`pyjcat`](#pyjcat)
+* [`pyjpaste`](#pyjpaste)
+* [`pyjsplit`](#pyjsplit)
+* [`pyjdiff`](#pyjdiff)
+* [`pyjuniq`](#pyjuniq)
 
 ## Installation
 

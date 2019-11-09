@@ -19,8 +19,17 @@ class PyJPs(BasePyJUnixFunction):
     Returns a simple process list.
     
     By default, it returns processes associated with the current user and terminal.
+
+    ::
     
-    * Optional parameter `-e` returns information about all processes as this is accessible to `psutil`.
+        usage: pyjps [-h] [-e]
+
+        Returns a list of current processes.
+
+        optional arguments:
+          -h, --help  show this help message and exit
+          -e          Show all processes
+
     
     **Note:**
         

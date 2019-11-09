@@ -15,6 +15,19 @@ class PyJKeys(BasePyJUnixFunction):
     Returns the keys of a JSON mapping. 
     
     Anything other than a JSON mapping as input to ``PyJKeys`` is an error condition.
+    
+    ::
+    
+        usage: pyjkeys [-h] [cli_vars [cli_vars ...]]
+
+        Returns the keys of a hash
+
+        positional arguments:
+          cli_vars    JSON Objects to extract the keys from
+
+        optional arguments:
+          -h, --help  show this help message and exit
+
     """
     
     def on_get_parser(self):

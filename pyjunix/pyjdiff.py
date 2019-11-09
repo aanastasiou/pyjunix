@@ -19,6 +19,20 @@ class PyJDiff(BasePyJUnixFunction):
     """
     Runs a diff equivalent over JSON data structures.
     
+    ::
+    
+        usage: pyjdiff [-h] file_1 file_2
+
+        Runs diff on two or more JSON documents
+
+        positional arguments:
+          file_1      First file to diff.
+          file_2      Second file to diff.
+
+        optional arguments:
+          -h, --help  show this help message and exit
+
+    
     PyjUnix' diff relies on `DeepDiff <https://github.com/seperman/deepdiff>`_ to assess differences between the JSON
     data structures. The output of DeepDiff is also a JSON data structure whose layout is explained in full detail 
     `here <https://deepdiff.readthedocs.io/en/latest/diff.html>`_.

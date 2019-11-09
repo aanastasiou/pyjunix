@@ -18,17 +18,26 @@ class PyJJoin(BasePyJUnixFunction):
     
     At the moment, the contents of the files should resolve to lists of lists.
     
-    **Mandatory parameters:**
+    ::
     
-        * f1, f2: These are filenames to the two files participating in the join. Either (but only one of them) 
-          can be ``-``, which indicates ``stdin``.
-          
-    **Optional parameters:**
-    
-        * ``-a FILENUM`` include unpairable items from FILENUM where FILENUM is 1 or 2
-        * ``-v FILENUM`` exactly like ``-a`` but suppress the joined items.
-        * ``-1 NUM`` zero based index of the field to join on from the first JSON file
-        * ``-2 NUM`` zero based index of the field to join on from the second JSON file
+        usage: pyjjoin [-h] [-a {1,2}] [-v {1,2}] [-1 FILE_1_KEY] [-2 FILE_2_KEY]
+                       f1 f2
+
+        Joins two JSON documents on specific fields.
+
+        positional arguments:
+          f1             File name of the first file to join.
+          f2             File name of the seocnd file to join.
+
+        optional arguments:
+          -h, --help     show this help message and exit
+          -a {1,2}       Include unpairable items from file 1 or 2
+          -v {1,2}       Similar to -a but indicating which file's items to suppress
+          -1 FILE_1_KEY  jsonpath READ expression that determines the attribute to use
+                         as a key for the first file
+          -2 FILE_2_KEY  jsonpath READ expression that determines the attribute to use
+                         as a key for the second file
+
     """
     
     def on_get_parser(self):

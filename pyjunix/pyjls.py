@@ -18,10 +18,21 @@ class PyJLs(BasePyJUnixFunction):
     """
     Performs a basic directory listing returning results as a JSON document.
     
-    By default lists the contents of the current directory. 
-    Optional parameter ``-maxdepth <N>`` applies ``ls`` recursively to sub-directories.
-    If ``-maxdepth -1``, it will perform an exhaustive recursive application. Use with caution.
+    By default lists the contents of the current directory.
     
+    ::
+    
+        usage: pyjls [-h] [-maxdepth MAXDEPTH] [path_spec]
+
+        List directory contents in JSON format.
+
+        positional arguments:
+          path_spec           The path to list
+
+        optional arguments:
+          -h, --help          show this help message and exit
+          -maxdepth MAXDEPTH  Maximum recursion depth.
+
     ``PyJLs`` returns a list of JSON mappings. Each mapping contains the following attributes:
     
     * item        Item name (Where "Item" can be a directory, file or link)

@@ -18,6 +18,19 @@ class PyJPrtPrn(BasePyJUnixFunction):
     This will reduce the load of parsing extra whitespace characters. But also, if ``PyJPrtPrn`` is called "mid-script"
     it will disrupt the functionality of ``PyJArray, PyJUnArray`` that expect JSON items in "compact form". Use with 
     caution.
+    
+    ::
+    
+        usage: pyprtprn [-h] [cli_vars [cli_vars ...]]
+
+        Renders JSON content in a more human readable form.
+
+        positional arguments:
+          cli_vars    Zero or more JSON objects to pretty print.
+
+        optional arguments:
+          -h, --help  show this help message and exit
+
     """
     
     def on_get_parser(self):
